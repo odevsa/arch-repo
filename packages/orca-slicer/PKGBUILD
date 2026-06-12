@@ -1,0 +1,38 @@
+pkgname='orca-slicer'
+pkgver=2.3.2
+pkgrel=1
+pkgdesc="OrcaSlicer - Um fatiador de código aberto para impressoras 3D (Versão AppImage)"
+arch=('x86_64')
+url="https://github.com/SoftFever/OrcaSlicer"
+license=('AGPL-3.0-only')
+depends=('webkit2gtk-4.1' 'fuse2' 'icu')
+provides=('orca-slicer')
+conflicts=('orca-slicer-bin' 'orca-slicer-git')
+
+source=("orca-slicer-${pkgver}.AppImage::https://github.com/SoftFever/OrcaSlicer/releases/download/v${pkgver}/OrcaSlicer_Linux_AppImage_Ubuntu2404_V${pkgver}.AppImage")
+sha256sums=('SKIP')
+
+prepare() {
+    cd "${srcdir}"
+    mkdir -p squashfs-root
+    bsdtar -xf "orca-slicer-${pkgver}.AppImage" -C squashfs-root || true
+}
+
+package() {
+    mkdir -p "${pkgdir}/usr/bin"
+    mkdir -p "${pkgdir}/usr/share/applications"
+    mkdir -p "${pkgdir}/usr/share/pixmaps"
+
+    cd "${srcdir}"
+
+    cp "orca-slicer-${pkgver}.AppImage" "${pkgdir}/usr/bin/orca-slicer"
+
+    if [ -f squashfs-root/OrcaSlicer.desktop ]; then
+        sed -i 's|Exec=.*|Exec=/usr/bin/orca-slicer %U|' squashfs-root/OrcaSlicer.desktop
+        cp squashfs-root/OrcaSlicer.desktop "${pkgdir}/usr/share/applications/orca-slicer.desktop"
+    fi
+
+    if [ -f squashfs-root/OrcaSlicer.png ]; then
+        cp squashfs-root/OrcaSlicer.png "${pkgdir}/usr/share/pixmaps/orca-slicer.png"
+    fi
+}

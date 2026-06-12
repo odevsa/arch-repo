@@ -1,0 +1,55 @@
+pkgname=code
+pkgver=1.124.2
+pkgrel=1
+pkgdesc="Visual Studio Code - Official Code editor from Microsoft"
+arch=('x86_64')
+url="https://code.visualstudio.com/"
+license=('custom:commercial')
+depends=('alsa-lib' 'gtk3' 'nss' 'libxss' 'libxtst' 'xdg-utils' 'libsecret')
+optdepends=('libdbusmenu-glib: Suporte a menus globais no Desktop')
+provides=('code' 'visual-studio-code')
+conflicts=('code' 'visual-studio-code')
+options=('!strip') # Evita corromper os binários já compilados da Microsoft
+
+source=("code-${pkgver}.deb::https://update.code.visualstudio.com/${pkgver}/linux-deb-x64/stable")
+sha256sums=('SKIP')
+
+prepare() {
+    cd "${srcdir}"
+    
+    if [ -f "code-${pkgver}.deb" ]; then
+        ar x "code-${pkgver}.deb"
+    fi
+
+    if [ -f "data.tar.xz" ]; then
+        tar -xf data.tar.xz
+    elif [ -f "data.tar.gz" ]; then
+        tar -xf data.tar.gz
+    fi
+}
+
+package() {
+    mkdir -p "${pkgdir}/usr/bin"
+    mkdir -p "${pkgdir}/usr/share/applications"
+    mkdir -p "${pkgdir}/usr/share/licenses/${pkgname}"
+
+    cd "${srcdir}"
+
+    mkdir -p "${pkgdir}/usr/share"
+    cp -r usr/share/code "${pkgdir}/usr/share/"
+
+    ln -s /usr/share/code/code "${pkgdir}/usr/bin/code"
+
+    cp usr/share/applications/code.desktop "${pkgdir}/usr/share/applications/"
+
+    if [ -d "usr/share/icons" ]; then
+        mkdir -p "${pkgdir}/usr/share/icons"
+        cp -r usr/share/icons/hicolor "${pkgdir}/usr/share/icons/"
+    fi
+
+    if [ -f "usr/share/doc/code/copyright" ]; then
+        cp usr/share/doc/code/copyright "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
+    fi
+
+    chmod 4755 "${pkgdir}/usr/share/code/chrome-sandbox" || true
+}

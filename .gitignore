@@ -1,0 +1,7 @@
+public
+
+packages/*/src/
+packages/*/pkg/
+packages/*/*.deb
+packages/*/*.AppImage
+packages/*/*.tar.*
