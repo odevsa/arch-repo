@@ -1,0 +1,48 @@
+pkgname=google-chrome
+pkgver=149.0.7827.114
+pkgrel=1
+pkgdesc="Google Chrome - The popular web browser from Google"
+arch=('x86_64')
+url="https://www.google.com/chrome"
+license=('custom:chrome')
+depends=('alsa-lib' 'gtk3' 'libcups' 'libxss' 'libxtst' 'nss' 'ttf-liberation' 'xdg-utils')
+optdepends=(
+	'pipewire: WebRTC desktop sharing under Wayland'
+	'kdialog: for file dialogs in KDE'
+	'gnome-keyring: for storing passwords in GNOME keyring'
+	'kwallet: for storing passwords in KWallet'
+)
+provides=('google-chrome')
+conflicts=('google-chrome')
+options=('!emptydirs' '!strip')
+
+# pega deb do google-chrome na versão específica do pkgver
+source=(
+  "google-chrome-${pkgver}.deb::https://dl.google.com/linux/chrome/deb/pool/main/g/google-chrome-stable/google-chrome-stable_${pkgver}-1_amd64.deb"
+  "google-chrome.sh"
+)
+sha256sums=(
+  'SKIP'
+  'SKIP'
+)
+
+package() {
+	bsdtar -xf data.tar.xz -C "$pkgdir/"
+
+	install -m755 google-chrome.sh "$pkgdir"/usr/bin/google-chrome
+
+	for i in 16x16 24x24 32x32 48x48 64x64 128x128 256x256; do
+		install -Dm644 "$pkgdir"/opt/google/chrome/product_logo_${i/x*/}.png \
+			"$pkgdir"/usr/share/icons/hicolor/$i/apps/google-chrome.png
+	done
+
+	sed -i \
+		-e "/Exec=/i\StartupWMClass=Google-chrome" \
+		-e "s/x-scheme-handler\/ftp;\?//g" \
+		"$pkgdir"/usr/share/applications/google-chrome.desktop
+
+	rm -r \
+		"$pkgdir"/etc/cron.daily/ \
+		"$pkgdir"/opt/google/chrome/cron/ \
+		"$pkgdir"/opt/google/chrome/product_logo_*.png
+}
