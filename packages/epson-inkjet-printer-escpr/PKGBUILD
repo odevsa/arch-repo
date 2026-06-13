@@ -10,10 +10,9 @@ provides=('epson-inkjet-printer-escpr')
 conflicts=('epson-inkjet-printer-escpr')
 options=(!strip !debug)
 
-#source=("https://distfiles.gentoo.org/pub/dev/dilfridge%40gentoo.org/net-print/epson-inkjet-printer-escpr/epson-inkjet-printer-escpr-${pkgver}-1.src.rpm")
 source=("https://download-center.epson.com/f/module/e934c1f6-0fc1-43e5-8d3e-0de8f3a3d357/epson-inkjet-printer-escpr-${pkgver}-1.src.rpm")
 sha256sums=('SKIP')
-DLAGENTS=('https::/usr/bin/curl --user-agent Firefox -qgb "" -fLC - --retry 3 --retry-delay 3 -o %o %u')
+DLAGENTS=('https::/usr/bin/curl -L -f -A "Mozilla/5.0" --retry 3 --retry-delay 3 -o %o %u')
 
 prepare() {
   tar xzf "${pkgname}-${pkgver}-1.tar.gz"
