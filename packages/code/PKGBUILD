@@ -9,7 +9,7 @@ depends=('alsa-lib' 'gtk3' 'nss' 'libxss' 'libxtst' 'xdg-utils' 'libsecret')
 optdepends=('libdbusmenu-glib: Suporte a menus globais no Desktop')
 provides=('code' 'visual-studio-code')
 conflicts=('code' 'visual-studio-code')
-options=('!strip') # Evita corromper os binários já compilados da Microsoft
+options=(!strip !zipman !debug)
 
 source=("code-${pkgver}.deb::https://update.code.visualstudio.com/${pkgver}/linux-deb-x64/stable")
 sha256sums=('SKIP')
