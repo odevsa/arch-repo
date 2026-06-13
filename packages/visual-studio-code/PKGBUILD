@@ -1,4 +1,4 @@
-pkgname=code
+pkgname=visual-studio-code
 pkgver=1.124.2
 pkgrel=1
 pkgdesc="Visual Studio Code - Official Code editor from Microsoft"

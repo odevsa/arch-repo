@@ -28,7 +28,6 @@ package() {
   ln -s /opt/${pkgname%-bin}/AppRun ${pkgdir}/usr/bin/orca-slicer
 
   install -Dm644 squashfs-root/OrcaSlicer.desktop ${pkgdir}/usr/share/applications/orca-slicer.desktop
-  sed -i '/^Name=/ c\Name=orca-slicer' ${pkgdir}/usr/share/applications/orca-slicer.desktop
   sed -i '/^Exec=/ c\Exec=/opt/orca-slicer/AppRun %U' ${pkgdir}/usr/share/applications/orca-slicer.desktop
   sed -i '/^MimeType=/ s|$|x-scheme-handler/orcaslicer;x-scheme-handler/bambustudio;|' ${pkgdir}/usr/share/applications/orca-slicer.desktop
 
