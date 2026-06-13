@@ -5,7 +5,7 @@ PKGBUILDS    := $(wildcard $(PACKAGES_DIR)/*/PKGBUILD)
 PACKAGES     := $(patsubst $(PACKAGES_DIR)/%/PKGBUILD,%,$(PKGBUILDS))
 IGNORED_PACKAGES := $(shell cat $(PACKAGES_DIR)/.ignore 2>/dev/null || true)
 
-.PHONY: help build database clean $(PACKAGES)
+.PHONY: help build database update clean $(PACKAGES)
 
 $(PACKAGES):
 	@mkdir -p $(OUTPUT_DIR)
@@ -21,6 +21,13 @@ build: clean $(filter-out $(IGNORED_PACKAGES),$(PACKAGES)) database html
 
 database:
 	cd $(OUTPUT_DIR) && repo-add $(REPO_NAME).db.tar.gz *.pkg.tar.zst
+
+update:
+	@for pkg in $(PACKAGES); do \
+		if [ -f $(PACKAGES_DIR)/$$pkg/update.sh ]; then \
+			bash $(PACKAGES_DIR)/$$pkg/update.sh; \
+		fi; \
+	done
 
 clean:
 	@rm -rf $(OUTPUT_DIR)
@@ -50,6 +57,7 @@ help:
 	@echo
 	@echo "Available targets:"
 	@echo "  build        Build all packages and update repo database"
+	@echo "  update       Update all packages versions"
 	@echo "  clean        Remove built packages and output directories"
 	@echo "  html         Generate HTML index of packages"
 	@echo "  help         Show this help message"
