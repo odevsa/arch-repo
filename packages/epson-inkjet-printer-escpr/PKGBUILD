@@ -12,7 +12,7 @@ options=(!strip !debug)
 
 source=("https://download-center.epson.com/f/module/e934c1f6-0fc1-43e5-8d3e-0de8f3a3d357/epson-inkjet-printer-escpr-${pkgver}-1.src.rpm")
 sha256sums=('SKIP')
-DLAGENTS=('https::/usr/bin/curl -L -f -A "Mozilla/5.0" --retry 3 --retry-delay 3 -o %o %u')
+DLAGENTS=('https::/usr/bin/curl -L -f -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36" -H "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8" -H "Accept-Language: en-US,en;q=0.5" --retry 3 --retry-delay 3 -o %o %u')
 
 prepare() {
   tar xzf "${pkgname}-${pkgver}-1.tar.gz"
