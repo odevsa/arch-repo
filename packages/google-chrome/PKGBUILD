@@ -12,13 +12,13 @@ optdepends=(
 	'gnome-keyring: for storing passwords in GNOME keyring'
 	'kwallet: for storing passwords in KWallet'
 )
-provides=('google-chrome')
-conflicts=('google-chrome')
+provides=("${pkgname}")
+conflicts=("${pkgname}")
 options=('!emptydirs' '!strip')
 
 source=(
   "google-chrome-${pkgver}.deb::https://dl.google.com/linux/chrome/deb/pool/main/g/google-chrome-stable/google-chrome-stable_${pkgver}-1_amd64.deb"
-  "google-chrome.sh"
+  "${pkgname}.sh"
 )
 sha256sums=(
   'SKIP'
@@ -28,7 +28,7 @@ sha256sums=(
 package() {
 	bsdtar -xf data.tar.xz -C "$pkgdir/"
 
-	install -m755 google-chrome.sh "$pkgdir"/usr/bin/google-chrome
+	install -m755 "${pkgname}.sh" "$pkgdir"/usr/bin/google-chrome
 
 	for i in 16x16 24x24 32x32 48x48 64x64 128x128 256x256; do
 		install -Dm644 "$pkgdir"/opt/google/chrome/product_logo_${i/x*/}.png \

@@ -9,6 +9,7 @@ IGNORED_PACKAGES := $(shell cat $(PACKAGES_DIR)/.ignore 2>/dev/null || true)
 
 $(PACKAGES):
 	@mkdir -p $(OUTPUT_DIR)
+	@cp $(PACKAGES_DIR)/$@/sources/* $(PACKAGES_DIR)/$@ 2>/dev/null || true
 	cd $(PACKAGES_DIR)/$@ && makepkg -s --noconfirm -c
 	@mv $(PACKAGES_DIR)/$@/*.pkg.tar.zst $(OUTPUT_DIR)/ 2>/dev/null || true
 	@rm -f $(PACKAGES_DIR)/$@/*.deb

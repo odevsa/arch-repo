@@ -16,7 +16,7 @@ options=(!strip)
 
 source=(
   "visual-studio-code-${pkgver}.deb::https://update.code.visualstudio.com/${pkgver}/linux-deb-x64/stable"
-  "visual-studio-code.sh"
+  "${pkgname}.sh"
 )
 sha256sums=(
   'SKIP'

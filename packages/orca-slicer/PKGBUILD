@@ -6,8 +6,8 @@ arch=('x86_64')
 url="https://github.com/SoftFever/OrcaSlicer"
 license=('AGPL-3.0-only')
 depends=('glu' 'cairo' 'gtk3' 'gstreamer' 'wayland' 'webkit2gtk-4.1' 'mesa-utils' 'libmspack' 'libice' 'libsm')
-provides=('orca-slicer')
-conflicts=('orca-slicer' 'orca-slicer-bin' 'orca-slicer-git')
+provides=("${pkgname}")
+conflicts=("${pkgname}")
 options=(!strip !zipman !debug)
 
 appimage="orca-slicer-${pkgver}.AppImage"
