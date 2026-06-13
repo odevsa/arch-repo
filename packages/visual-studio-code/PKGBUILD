@@ -5,8 +5,11 @@ pkgdesc="Visual Studio Code - Official Code editor from Microsoft"
 arch=('x86_64')
 url="https://code.visualstudio.com/"
 license=('custom:commercial')
-depends=('alsa-lib' 'gtk3' 'nss' 'libxss' 'libxtst' 'xdg-utils' 'libsecret')
-optdepends=('libdbusmenu-glib: Suporte a menus globais no Desktop')
+depends=(libxkbfile gnupg gtk3 libsecret nss gcc-libs libnotify libxss glibc lsof shared-mime-info xdg-utils alsa-lib)
+optdepends=('glib2: Needed for move to trash functionality'
+            'libdbusmenu-glib: Needed for KDE global menu'
+            'org.freedesktop.secrets: Needed for settings sync'
+            'icu69: Needed for live share')
 provides=('code' 'vscode' 'visual-studio-code')
 conflicts=('code')
 options=(!strip)
