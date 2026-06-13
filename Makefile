@@ -10,7 +10,10 @@ $(PACKAGES):
 	@mkdir -p $(OUTPUT_DIR)
 	cd $(PACKAGES_DIR)/$@ && makepkg -s --noconfirm -c
 	@mv $(PACKAGES_DIR)/$@/*.pkg.tar.zst $(OUTPUT_DIR)/ 2>/dev/null || true
-	@rm -f $(PACKAGES_DIR)/$@/*.deb $(PACKAGES_DIR)/$@/*.AppImage $(PACKAGES_DIR)/$@/*.tar.* 2>/dev/null || true
+	@rm -f $(PACKAGES_DIR)/$@/*.deb
+	@rm -f $(PACKAGES_DIR)/$@/*.rpm
+	@rm -f $(PACKAGES_DIR)/$@/*.AppImage
+	@rm -f $(PACKAGES_DIR)/$@/*.tar.*
 
 build: clean $(PACKAGES) database html
 
@@ -18,11 +21,12 @@ database:
 	cd $(OUTPUT_DIR) && repo-add $(REPO_NAME).db.tar.gz *.pkg.tar.zst
 
 clean:
-	rm -rf $(OUTPUT_DIR)
-	rm -rf $(PACKAGES_DIR)/*/{src,pkg}
-	rm -f $(PACKAGES_DIR)/*/*.deb
-	rm -f $(PACKAGES_DIR)/*/*.AppImage
-	rm -f $(PACKAGES_DIR)/*/*.tar.*
+	@rm -rf $(OUTPUT_DIR)
+	@rm -rf $(PACKAGES_DIR)/*/{src,pkg}
+	@rm -f $(PACKAGES_DIR)/*/*.deb
+	@rm -f $(PACKAGES_DIR)/*/*.rpm
+	@rm -f $(PACKAGES_DIR)/*/*.AppImage
+	@rm -f $(PACKAGES_DIR)/*/*.tar.*
 
 html:
 	@echo "<html>" > $(OUTPUT_DIR)/index.html
