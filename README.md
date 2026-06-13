@@ -15,6 +15,7 @@ See the `Makefile` at the repository root for available targets. Typical usage:
 - `make build`: Build all packages and update repo database
 - `make <packages>`: Build specific packages
 - `make clean`: Remove built packages and output directories
+- `make html`: Generate HTML index of packages
 - `make help`: Show this help message
 
 Check the `Makefile` to see the exact target names and behaviors.

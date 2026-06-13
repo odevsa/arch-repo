@@ -12,7 +12,7 @@ $(PACKAGES):
 	@mv $(PACKAGES_DIR)/$@/*.pkg.tar.zst $(OUTPUT_DIR)/ 2>/dev/null || true
 	@rm -f $(PACKAGES_DIR)/$@/*.deb $(PACKAGES_DIR)/$@/*.AppImage $(PACKAGES_DIR)/$@/*.tar.* 2>/dev/null || true
 
-build: clean $(PACKAGES) database
+build: clean $(PACKAGES) database html
 
 database:
 	cd $(OUTPUT_DIR) && repo-add $(REPO_NAME).db.tar.gz *.pkg.tar.zst
@@ -24,12 +24,25 @@ clean:
 	rm -f $(PACKAGES_DIR)/*/*.AppImage
 	rm -f $(PACKAGES_DIR)/*/*.tar.*
 
+html:
+	@echo "<html>" > $(OUTPUT_DIR)/index.html
+	@echo "<head><title>Arch Repo</title></head>" >> $(OUTPUT_DIR)/index.html
+	@echo "<body>" >> $(OUTPUT_DIR)/index.html
+	@for pkg in $(wildcard $(OUTPUT_DIR)/*.pkg.tar.zst); do \
+		pkgname=$$(basename $$pkg); \
+		echo "<a href=\"$$pkgname\">$$pkgname</a><br />" >> $(OUTPUT_DIR)/index.html; \
+	done
+	@echo "</body>" >> $(OUTPUT_DIR)/index.html
+	@echo "</html>" >> $(OUTPUT_DIR)/index.html
+
+
 help:
 	@echo "Usage: make <target>"
 	@echo
 	@echo "Available targets:"
 	@echo "  build        Build all packages and update repo database"
 	@echo "  clean        Remove built packages and output directories"
+	@echo "  html         Generate HTML index of packages"
 	@echo "  help         Show this help message"
 	@echo "  <packages>   Build specific packages (see below)"
 	@echo
