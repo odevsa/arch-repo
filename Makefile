@@ -3,6 +3,7 @@ OUTPUT_DIR   := public
 REPO_NAME    := odevsa
 PKGBUILDS    := $(wildcard $(PACKAGES_DIR)/*/PKGBUILD)
 PACKAGES     := $(patsubst $(PACKAGES_DIR)/%/PKGBUILD,%,$(PKGBUILDS))
+IGNORED_PACKAGES := $(shell cat $(PACKAGES_DIR)/.ignore 2>/dev/null || true)
 
 .PHONY: help build database clean $(PACKAGES)
 
@@ -15,7 +16,7 @@ $(PACKAGES):
 	@rm -f $(PACKAGES_DIR)/$@/*.AppImage
 	@rm -f $(PACKAGES_DIR)/$@/*.tar.*
 
-build: clean $(PACKAGES) database html
+build: clean $(filter-out $(IGNORED_PACKAGES),$(PACKAGES)) database html
 
 database:
 	cd $(OUTPUT_DIR) && repo-add $(REPO_NAME).db.tar.gz *.pkg.tar.zst
@@ -30,7 +31,10 @@ clean:
 
 html:
 	@echo "<html>" > $(OUTPUT_DIR)/index.html
-	@echo "<head><title>Arch Repo</title></head>" >> $(OUTPUT_DIR)/index.html
+	@echo "<head>" >> $(OUTPUT_DIR)/index.html
+	@echo "<title>Arch Repo</title>" >> $(OUTPUT_DIR)/index.html
+	@echo "<link rel=\"icon\" type=\"image/png\" href=\"https://archlinux.org/static/archlinux_common_style/favicon.png\" />" >> $(OUTPUT_DIR)/index.html
+	@echo "</head>" >> $(OUTPUT_DIR)/index.html
 	@echo "<body>" >> $(OUTPUT_DIR)/index.html
 	@for pkg in $(wildcard $(OUTPUT_DIR)/*.pkg.tar.zst); do \
 		pkgname=$$(basename $$pkg); \
