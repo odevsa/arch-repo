@@ -16,7 +16,6 @@ provides=('google-chrome')
 conflicts=('google-chrome')
 options=('!emptydirs' '!strip')
 
-# pega deb do google-chrome na versão específica do pkgver
 source=(
   "google-chrome-${pkgver}.deb::https://dl.google.com/linux/chrome/deb/pool/main/g/google-chrome-stable/google-chrome-stable_${pkgver}-1_amd64.deb"
   "google-chrome.sh"
