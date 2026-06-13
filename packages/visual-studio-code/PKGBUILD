@@ -7,49 +7,33 @@ url="https://code.visualstudio.com/"
 license=('custom:commercial')
 depends=('alsa-lib' 'gtk3' 'nss' 'libxss' 'libxtst' 'xdg-utils' 'libsecret')
 optdepends=('libdbusmenu-glib: Suporte a menus globais no Desktop')
-provides=('code' 'visual-studio-code')
-conflicts=('code' 'visual-studio-code')
-options=(!strip !zipman !debug)
+provides=('code' 'vscode' 'visual-studio-code')
+conflicts=('code')
+options=(!strip)
 
-source=("code-${pkgver}.deb::https://update.code.visualstudio.com/${pkgver}/linux-deb-x64/stable")
-sha256sums=('SKIP')
-
-prepare() {
-    cd "${srcdir}"
-    
-    if [ -f "code-${pkgver}.deb" ]; then
-        ar x "code-${pkgver}.deb"
-    fi
-
-    if [ -f "data.tar.xz" ]; then
-        tar -xf data.tar.xz
-    elif [ -f "data.tar.gz" ]; then
-        tar -xf data.tar.gz
-    fi
-}
+source=(
+  "visual-studio-code-${pkgver}.deb::https://update.code.visualstudio.com/${pkgver}/linux-deb-x64/stable"
+  "visual-studio-code.sh"
+)
+sha256sums=(
+  'SKIP'
+  'SKIP'
+)
 
 package() {
-    mkdir -p "${pkgdir}/usr/bin"
-    mkdir -p "${pkgdir}/usr/share/applications"
-    mkdir -p "${pkgdir}/usr/share/licenses/${pkgname}"
+  bsdtar -xf data.tar.xz -C "${pkgdir}/"
 
-    cd "${srcdir}"
+  install -d "${pkgdir}/usr/bin"
+  install -d "${pkgdir}/usr/share/licenses/${pkgname}"
 
-    mkdir -p "${pkgdir}/usr/share"
-    cp -r usr/share/code "${pkgdir}/usr/share/"
+  ln -s /usr/share/code/resources/app/LICENSE.rtf \
+    "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE.rtf"
 
-    ln -s /usr/share/code/code "${pkgdir}/usr/bin/code"
+  install -m755 "${srcdir}/${pkgname}.sh" "${pkgdir}/usr/bin/code"
 
-    cp usr/share/applications/code.desktop "${pkgdir}/usr/share/applications/"
+  sed -i \
+    -e 's/^\(Exec=\)[^ ]*/\1code/g' \
+    "${pkgdir}"/usr/share/applications/*.desktop
 
-    if [ -d "usr/share/icons" ]; then
-        mkdir -p "${pkgdir}/usr/share/icons"
-        cp -r usr/share/icons/hicolor "${pkgdir}/usr/share/icons/"
-    fi
-
-    if [ -f "usr/share/doc/code/copyright" ]; then
-        cp usr/share/doc/code/copyright "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
-    fi
-
-    chmod 4755 "${pkgdir}/usr/share/code/chrome-sandbox" || true
+  chmod u-s "${pkgdir}/usr/share/code/chrome-sandbox"
 }
