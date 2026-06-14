@@ -1,0 +1,31 @@
+pkgname=onlyoffice
+pkgver=9.4.0
+pkgrel=1
+pkgdesc="ONLYOFFICE - The popular office suite"
+arch=('x86_64')
+url="https://www.onlyoffice.com/"
+license=('AGPL-3.0-only')
+depends=('alsa-lib' 'at-spi2-core' 'cairo' 'curl' 'dbus' 'desktop-file-utils' 'expat' 'fontconfig' 'freetype2' 'glib2' 'glibc' 'gtk3' 'gstreamer' 'gst-plugins-base-libs' 'gst-plugins-ugly' 'hicolor-icon-theme' 'libcups' 'libdrm' 'libgcc' 'libgl' 'libnotify' 'libpulse' 'libstdc++' 'libx11' 'libxcomposite' 'libxdamage' 'libxcb' 'libxext' 'libxfixes' 'libxi' 'libxkbcommon' 'libxrandr' 'libxss' 'mesa' 'nss' 'nspr' 'pango' 'sh' 'ttf-carlito' 'ttf-dejavu' 'ttf-liberation')
+optdepends=(
+	'gst-libav: for playing embedded video files'
+	'gst-plugins-good: for playing embedded video files'
+	'libreoffice: for OpenSymbol fonts'
+	'otf-takao: for japanese Takao fonts'
+	'ttf-ms-fonts: for Microsoft fonts'
+)
+provides=("${pkgname}")
+conflicts=("${pkgname}")
+options=('!debug' '!emptydirs' '!strip')
+
+source=("onlyoffice-${pkgver}.deb"::"https://github.com/ONLYOFFICE/DesktopEditors/releases/download/v${pkgver}/onlyoffice-desktopeditors_amd64.deb")
+sha256sums=('SKIP')
+
+prepare() {
+    mkdir -p "onlyoffice-${pkgver}/pkg"
+    bsdtar -xf "${srcdir}/onlyoffice-${pkgver}.deb" -C "onlyoffice-${pkgver}"
+    bsdtar -xf "onlyoffice-${pkgver}/data.tar.xz" -C "onlyoffice-${pkgver}/pkg"
+}
+
+package() {
+    cp -dr --no-preserve='ownership' "onlyoffice-${pkgver}"/pkg/* "$pkgdir"
+}
