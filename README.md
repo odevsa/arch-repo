@@ -1,8 +1,6 @@
 # arch-repo
 
-Project: arch-repo
-
-GitHub Pages: https://odevsa.github.io/arch-repo
+Repository: https://odevsa.github.io/arch-repo
 
 ### Overview
 
