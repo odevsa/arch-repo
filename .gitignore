@@ -2,6 +2,7 @@ public
 
 packages/*/src/
 packages/*/pkg/
+packages/*/*.zip
 packages/*/*.deb
 packages/*/*.rpm
 packages/*/*.AppImage
