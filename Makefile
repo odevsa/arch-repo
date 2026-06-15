@@ -12,6 +12,7 @@ $(PACKAGES):
 	@cp $(PACKAGES_DIR)/$@/sources/* $(PACKAGES_DIR)/$@ 2>/dev/null || true
 	cd $(PACKAGES_DIR)/$@ && makepkg -s --noconfirm -c
 	@mv $(PACKAGES_DIR)/$@/*.pkg.tar.zst $(OUTPUT_DIR)/ 2>/dev/null || true
+	@rm -f $(PACKAGES_DIR)/$@/*.sh
 	@rm -f $(PACKAGES_DIR)/$@/*.zip
 	@rm -f $(PACKAGES_DIR)/$@/*.deb
 	@rm -f $(PACKAGES_DIR)/$@/*.rpm
@@ -25,14 +26,15 @@ database:
 
 update:
 	@for pkg in $(PACKAGES); do \
-		if [ -f $(PACKAGES_DIR)/$$pkg/update.sh ]; then \
-			bash $(PACKAGES_DIR)/$$pkg/update.sh; \
+		if [ -f $(PACKAGES_DIR)/$$pkg/update ]; then \
+			bash $(PACKAGES_DIR)/$$pkg/update; \
 		fi; \
 	done
 
 clean:
 	@rm -rf $(OUTPUT_DIR)
 	@rm -rf $(PACKAGES_DIR)/*/{src,pkg}
+	@rm -f $(PACKAGES_DIR)/*/*.sh
 	@rm -f $(PACKAGES_DIR)/*/*.zip
 	@rm -f $(PACKAGES_DIR)/*/*.deb
 	@rm -f $(PACKAGES_DIR)/*/*.rpm
@@ -52,7 +54,6 @@ html:
 	done
 	@echo "</body>" >> $(OUTPUT_DIR)/index.html
 	@echo "</html>" >> $(OUTPUT_DIR)/index.html
-
 
 help:
 	@echo "Usage: make <target>"

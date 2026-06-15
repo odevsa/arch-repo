@@ -12,8 +12,8 @@ options=(!strip !debug)
 
 # source=("https://download-center.epson.com/f/module/e934c1f6-0fc1-43e5-8d3e-0de8f3a3d357/epson-inkjet-printer-escpr-${pkgver}-1.src.rpm")
 source=("${pkgname}-${pkgver}-1.src.rpm")
-sha256sums=('SKIP')
-DLAGENTS=('https::/usr/bin/curl --user-agent Firefox -qgb "" -fLC - --retry 3 --retry-delay 3 -o %o %u')
+sha256sums=('dd2819236f875889041343f1b63a0b4ada813b90485b4c66c3e187ad4895359e')
+DLAGENTS=("https::/usr/bin/curl --user-agent 'Mozilla/5.0 (X11; Linux x86_64)' -fsSL -o %o %u --retry 3 --retry-delay 3")
 
 prepare() {
   tar xzf "${pkgname}-${pkgver}-1.tar.gz"

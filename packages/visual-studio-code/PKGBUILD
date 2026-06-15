@@ -14,14 +14,8 @@ provides=('code' 'vscode' 'visual-studio-code')
 conflicts=('code')
 options=(!strip)
 
-source=(
-  "visual-studio-code-${pkgver}.deb::https://update.code.visualstudio.com/${pkgver}/linux-deb-x64/stable"
-  "${pkgname}.sh"
-)
-sha256sums=(
-  'SKIP'
-  'SKIP'
-)
+source=("visual-studio-code-${pkgver}.deb::https://update.code.visualstudio.com/${pkgver}/linux-deb-x64/stable" "${pkgname}.sh")
+sha256sums=('818b26cf63c020b89e27ed94edadb46e04ed546786d62286ef88ded0bfe4b596' 'e31b377dddd35e0efaa50db0951792d898d67f85be8ca14a3913304391127c86')
 
 package() {
   bsdtar -xf data.tar.xz -C "${pkgdir}/"

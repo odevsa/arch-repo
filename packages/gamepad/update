@@ -1,0 +1,75 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Latest version
+DIRECTORY=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &> /dev/null && pwd)
+PACKAGE=$(basename "$DIRECTORY")
+RESPONSE=$(curl -sSL "https://api.github.com/repos/odevsa/gamepad/releases/latest")
+LATEST_VERSION=$(printf '%s' "$RESPONSE" | sed -n 's/.*"tag_name"[[:space:]]*:[[:space:]]*"\([^\"]*\)".*/\1/p')
+LATEST_VERSION=${LATEST_VERSION#v}
+PKGBUILD_FILE="$DIRECTORY/PKGBUILD"
+
+if [ -z "$LATEST_VERSION" ]; then
+  exit 1
+fi
+
+# Apply update
+CURRENT_VERSION=$(grep -E '^pkgver=' "$PKGBUILD_FILE" | cut -d= -f2 | tr -d '"')
+if [ "$CURRENT_VERSION" != "$LATEST_VERSION" ]; then
+  pkgname="$PACKAGE"
+  pkgver="$LATEST_VERSION"
+
+  # Update pkgver
+  sed -i "s/^pkgver=.*/pkgver=${pkgver}/" "$PKGBUILD_FILE"
+  echo "[${PACKAGE}] Updated: ${CURRENT_VERSION} -> ${pkgver}"
+  
+  # Update sha256sums
+  NEW_SHA256SUMS=()
+  mapfile -t _sources < <(awk '/^source=/{p=1} p{print} p && /\)/{exit}' "$PKGBUILD_FILE" | grep -o '"[^\"]*"' | sed 's/^"//;s/"$//')
+  for RAW_FIRST in "${_sources[@]}"; do
+    URL_PART=${RAW_FIRST#*::}
+    if [ "$URL_PART" = "$RAW_FIRST" ]; then
+      URL_PART=$RAW_FIRST
+    fi
+    EXPANDED=${URL_PART//\$\{pkgver\}/${pkgver}}
+    EXPANDED=${EXPANDED//\$\{pkgname\}/${PACKAGE}}
+    HASH=""
+    if printf '%s' "$EXPANDED" | grep -qE '^https?://'; then
+      TMPFILE=$(mktemp)
+      curl -sSL -o "$TMPFILE" -- "$EXPANDED"
+      HASH=$(sha256sum "$TMPFILE" | cut -d' ' -f1 || true)
+      rm -f "$TMPFILE"
+    else
+      LOCAL_PATH="$DIRECTORY/sources/$EXPANDED"
+      if [ -f "$LOCAL_PATH" ]; then
+        HASH=$(sha256sum "$LOCAL_PATH" | cut -d' ' -f1 || true)
+      else
+        HASH="SKIP"
+      fi
+    fi
+    if [ -n "$HASH" ]; then
+      NEW_SHA256SUMS+=("'${HASH}'")
+    else
+      NEW_SHA256SUMS+=("'SKIP'")
+    fi
+  done
+  
+  NEW_SHA256SUMS_STR=$(printf "%s\n" "${NEW_SHA256SUMS[@]}" | sed ':a;N;$!ba;s/\n/ /g')
+  NEW_SHA256_LINE="sha256sums=(${NEW_SHA256SUMS_STR})"
+  awk -v new="$NEW_SHA256_LINE" '
+    BEGIN{skip=0}
+    {
+      if(skip){
+        if($0 ~ /\)/){ skip=0 }
+        next
+      }
+      if($0 ~ /^sha256sums=\(/){
+        print new
+        if($0 ~ /\)/){
+          # single-line array, continue
+        } else {
+          skip=1
+        }
+      } else { print $0 }
+    }' "$PKGBUILD_FILE" > "$PKGBUILD_FILE.tmp" && mv "$PKGBUILD_FILE.tmp" "$PKGBUILD_FILE"
+fi

@@ -10,7 +10,7 @@ conflicts=("${pkgname}")
 options=(!strip !zipman !debug)
 
 source=("${pkgname}-${pkgver}.zip::https://github.com/odevsa/gamepad/releases/download/${pkgver}/gamepad-${pkgver}-x86_64.zip")
-sha256sums=('SKIP')
+sha256sums=('3d0a0831ccffe5f6c7c707abb5099abae047f0791cfd6c08135011effef80075')
 
 package() {
   install -Dm755 "${pkgname}" "${pkgdir}/usr/bin/${pkgname}"
