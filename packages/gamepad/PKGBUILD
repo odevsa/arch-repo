@@ -1,5 +1,5 @@
 pkgname='gamepad'
-pkgver=0.1.0
+pkgver=0.1.1
 pkgrel=1
 pkgdesc="Gamepad - A small open-source gamepad tester"
 arch=('x86_64')
