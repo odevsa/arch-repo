@@ -1,0 +1,25 @@
+pkgname='dotnet-sdk-3.1'
+pkgver=3.1.426
+pkgrel=1
+pkgdesc="Microsoft .NET Core SDK 3.1 - A cross-platform runtime for building websites, services, and console apps."
+arch=('x86_64')
+url='https://www.microsoft.com/net/core'
+license=('MIT')
+depends=('gcc-libs' 'glibc')
+provides=("${pkgname}")
+conflicts=("${pkgname}")
+options=(staticlibs !strip !debug)
+
+source=("dotnet-sdk-${pkgver}.tar.gz::https://builds.dotnet.microsoft.com/dotnet/Sdk/${pkgver}/dotnet-sdk-${pkgver}-linux-x64.tar.gz")
+sha256sums=('cce481c054c331ad57e26e5d326993b2209a61b4df66118e7bae878d09f51dc1')
+
+package() {
+    install -dm 755 "${pkgdir}"/usr/share/{dotnet,licenses}
+    cp -dr --no-preserve=ownership sdk templates "${pkgdir}"/usr/share/dotnet/
+    
+    ln -s dotnet-host "${pkgdir}"/usr/share/licenses/dotnet-sdk-3.1
+    
+    if [ ! -e /usr/bin/dotnet ]; then
+        install -Dm755 dotnet "${pkgdir}"/usr/bin/dotnet
+    fi
+}
