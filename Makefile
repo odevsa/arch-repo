@@ -12,12 +12,14 @@ $(PACKAGES):
 	@cp $(PACKAGES_DIR)/$@/sources/* $(PACKAGES_DIR)/$@ 2>/dev/null || true
 	cd $(PACKAGES_DIR)/$@ && makepkg -s --noconfirm -c
 	@mv $(PACKAGES_DIR)/$@/*.pkg.tar.zst $(OUTPUT_DIR)/ 2>/dev/null || true
+	@rm -f $(PACKAGES_DIR)/$@/*.install
 	@rm -f $(PACKAGES_DIR)/$@/*.sh
 	@rm -f $(PACKAGES_DIR)/$@/*.zip
 	@rm -f $(PACKAGES_DIR)/$@/*.deb
 	@rm -f $(PACKAGES_DIR)/$@/*.rpm
 	@rm -f $(PACKAGES_DIR)/$@/*.AppImage
 	@rm -f $(PACKAGES_DIR)/$@/*.tar.*
+	@rm -f $(PACKAGES_DIR)/$@/*.part
 
 build: clean $(filter-out $(IGNORED_PACKAGES),$(PACKAGES)) database html
 
@@ -34,12 +36,14 @@ update:
 clean:
 	@rm -rf $(OUTPUT_DIR)
 	@rm -rf $(PACKAGES_DIR)/*/{src,pkg}
+	@rm -f $(PACKAGES_DIR)/*/*.install
 	@rm -f $(PACKAGES_DIR)/*/*.sh
 	@rm -f $(PACKAGES_DIR)/*/*.zip
 	@rm -f $(PACKAGES_DIR)/*/*.deb
 	@rm -f $(PACKAGES_DIR)/*/*.rpm
 	@rm -f $(PACKAGES_DIR)/*/*.AppImage
 	@rm -f $(PACKAGES_DIR)/*/*.tar.*
+	@rm -f $(PACKAGES_DIR)/*/*.part
 
 html:
 	@echo "<html>" > $(OUTPUT_DIR)/index.html

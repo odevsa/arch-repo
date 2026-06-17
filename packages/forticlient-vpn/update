@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+set -euo pipefail
+source "packages/helpers"
+
+# Get latest version
+LATEST_VERSION=7.4.3.5411
+
+update_version "$LATEST_VERSION"
+

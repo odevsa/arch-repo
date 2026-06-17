@@ -2,9 +2,11 @@ public
 
 packages/*/src/
 packages/*/pkg/
+packages/*/*.install
 packages/*/*.sh
 packages/*/*.zip
 packages/*/*.deb
 packages/*/*.rpm
 packages/*/*.AppImage
 packages/*/*.tar.*
+packages/*/*.part

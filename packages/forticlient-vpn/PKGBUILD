@@ -1,0 +1,62 @@
+pkgname=forticlient-vpn
+pkgver=7.4.3.5411
+pkgrel=1
+pkgdesc="FortiClient VPN - A VPN client for Fortinet's FortiGate firewalls"
+arch=("x86_64")
+url="https://www.fortinet.com/support/product-downloads"
+license=('LicenseRef-fortinet')
+depends=('alsa-lib' 'at-spi2-core' 'bash' 'cairo' 'dbus' 'expat' 'glib2' 'glibc' 'gtk3' 'hicolor-icon-theme' 'libcups' 'libdrm' 'libgcc' 'libnotify' 'libsecret' 'libx11' 'libxcb' 'libxcomposite' 'libxdamage' 'libxext' 'libxfixes' 'libxkbcommon' 'libxrandr' 'mesa' 'nspr' 'nss' 'pango' 'procps-ng' 'systemd-libs' 'util-linux-libs' 'zlib')
+optdepends=(
+    'gtk2: legacy GTK2 tray icon support (AUR)'
+    'libappindicator-gtk2: GTK2 tray icon support (AUR)'
+    'gnome-keyring: keyring integration'
+    'gzip: compression support'
+    'iptables: firewall rules support'
+    'libappindicator-gtk3: system tray icon support (GTK3)'
+    'libxss: screen saver integration'
+    'net-tools: legacy network tools'
+    'openssl: TLS support'
+    'polkit: privilege escalation prompts'
+    'systemd: service management'
+    'mate-polkit: polkit authentication for MATE'
+    'polkit-gnome: polkit authentication for GNOME'
+    'polkit-kde-agent: polkit authentication for KDE'
+    'deepin-polkit-agent: polkit authentication for Deepin'
+    'pantheon-polkit-agent: polkit authentication for Pantheon'
+    'lxqt-policykit: polkit authentication for LXQt'
+)
+provides=('fortivpn' 'FortiClient')
+conflicts=('forticlient')
+options=('!strip' '!debug')
+install='forticlient-vpn.install'
+
+source=("forticlient_vpn_${pkgver}_amd64.deb::https://filestore.fortinet.com/forticlient/downloads/forticlient_vpn_${pkgver}_amd64.deb")
+# DLAGENTS=('https::/usr/bin/curl --user-agent Firefox -qgb "" -fLC - --retry 3 --retry-delay 3 -o %o %u')
+sha256sums=('d2c0366decbf0b907fbf0d9306b8ac0b705d2d9cb4eb7b946ae06ce5388d4e5a')
+
+prepare() {
+    cd "$srcdir"
+    bsdtar -xf "forticlient_vpn_${pkgver}_amd64.deb"
+}
+
+package() {
+    cd "$srcdir"
+
+    if [ -f data.tar.zst ]; then
+        bsdtar -xf data.tar.zst -C "$pkgdir/"
+    else
+        bsdtar -xf data.tar.xz -C "$pkgdir/"
+    fi
+
+    install -Dm644 "${pkgdir}/lib/systemd/system/forticlient.service" \
+        "${pkgdir}/usr/lib/systemd/system/forticlient.service"
+    rm -rf "${pkgdir}/lib"
+
+    mkdir -p "${pkgdir}/var/lib/forticlient"
+
+    install -Dm644 "${pkgdir}/usr/share/doc/forticlient/copyright" \
+        "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
+
+    mkdir -p "${pkgdir}/usr/bin"
+    ln -sf '/opt/forticlient/fortivpn' "${pkgdir}/usr/bin/fortivpn"
+}
