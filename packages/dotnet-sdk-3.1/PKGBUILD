@@ -1,25 +1,74 @@
-pkgname='dotnet-sdk-3.1'
+pkgbase=dotnet-core-3.1-bin
+pkgname=(
+    'dotnet-runtime-3.1-bin'
+    'aspnet-runtime-3.1-bin'
+    'dotnet-sdk-3.1-bin'
+    'dotnet-targeting-pack-3.1-bin'
+    'aspnet-targeting-pack-3.1-bin'
+)
 pkgver=3.1.426
 pkgrel=1
-pkgdesc="Microsoft .NET Core SDK 3.1 - A cross-platform runtime for building websites, services, and console apps."
 arch=('x86_64')
 url='https://www.microsoft.com/net/core'
 license=('MIT')
-depends=('gcc-libs' 'glibc')
-provides=("${pkgname}")
-conflicts=("${pkgname}")
 options=(staticlibs !strip !debug)
 
 source=("dotnet-sdk-${pkgver}.tar.gz::https://builds.dotnet.microsoft.com/dotnet/Sdk/${pkgver}/dotnet-sdk-${pkgver}-linux-x64.tar.gz")
 sha256sums=('cce481c054c331ad57e26e5d326993b2209a61b4df66118e7bae878d09f51dc1')
 
-package() {
+
+package_dotnet-runtime-3.1-bin() {
+    pkgdesc='The .NET Core runtime'
+    depends=('dotnet-host' 'gcc-libs' 'glibc' 'icu' 'libcurl.so' 'libgssapi_krb5.so' 'libunwind' 'openssl' 'zlib')
+    optdepends=('lttng-ust2.12: CoreCLR tracing')
+    provides=('dotnet-runtime-3.1')
+    conflicts=('dotnet-runtime-3.1')
+
+    install -dm 755 "${pkgdir}"/usr/share/{dotnet/shared,licenses}
+    cp -dr --no-preserve=ownership shared/Microsoft.NETCore.App "${pkgdir}"/usr/share/dotnet/shared/
+    ln -s dotnet-host "${pkgdir}"/usr/share/licenses/dotnet-runtime-3.1
+}
+
+package_aspnet-runtime-3.1-bin() {
+    pkgdesc='The ASP.NET Core runtime'
+    depends=('dotnet-runtime-3.1')
+    provides=('aspnet-runtime-3.1')
+    conflicts=('aspnet-runtime-3.1')
+
+    install -dm 755 "${pkgdir}"/usr/share/{dotnet/shared,licenses}
+    cp -dr --no-preserve=ownership shared/Microsoft.AspNetCore.App "${pkgdir}"/usr/share/dotnet/shared/
+    ln -s dotnet-host "${pkgdir}"/usr/share/licenses/aspnet-runtime-3.1
+}
+
+package_dotnet-sdk-3.1-bin() {
+    pkgdesc='The .NET Core SDK'
+    depends=('dotnet-runtime-3.1' 'gcc-libs' 'glibc' 'dotnet-targeting-pack-3.1' 'netstandard-targeting-pack')
+    provides=('dotnet-sdk-3.1')
+    conflicts=('dotnet-sdk-3.1')
+
     install -dm 755 "${pkgdir}"/usr/share/{dotnet,licenses}
     cp -dr --no-preserve=ownership sdk templates "${pkgdir}"/usr/share/dotnet/
-    
     ln -s dotnet-host "${pkgdir}"/usr/share/licenses/dotnet-sdk-3.1
-    
-    if [ ! -e /usr/bin/dotnet ]; then
-        install -Dm755 dotnet "${pkgdir}"/usr/bin/dotnet
-    fi
+}
+
+package_dotnet-targeting-pack-3.1-bin() {
+    pkgdesc='The .NET Core targeting pack'
+    depends=('netstandard-targeting-pack')
+    provides=('dotnet-targeting-pack-3.1')
+    conflicts=('dotnet-targeting-pack-3.1')
+
+    install -dm 755 "${pkgdir}"/usr/share/{dotnet,dotnet/packs,licenses}
+    cp -dr --no-preserve=ownership packs/Microsoft.NETCore.App.{Host.linux-x64,Ref} "${pkgdir}"/usr/share/dotnet/packs/
+    ln -s dotnet-host "${pkgdir}"/usr/share/licenses/dotnet-targeting-pack-3.1
+}
+
+package_aspnet-targeting-pack-3.1-bin() {
+    pkgdesc='The ASP.NET Core targeting pack'
+    depends=('dotnet-targeting-pack-3.1')
+    provides=('aspnet-targeting-pack-3.1')
+    conflicts=('aspnet-targeting-pack-3.1')
+
+    install -dm 755 "${pkgdir}"/usr/share/{dotnet,dotnet/packs,licenses}
+    cp -dr --no-preserve=ownership packs/Microsoft.AspNetCore.App.Ref "${pkgdir}"/usr/share/dotnet/packs/
+    ln -s dotnet-host "${pkgdir}"/usr/share/licenses/aspnet-targeting-pack-3.1
 }
