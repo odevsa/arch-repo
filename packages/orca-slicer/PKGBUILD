@@ -22,12 +22,12 @@ prepare() {
 package() {
   install -d ${pkgdir}/opt/${pkgname}/
   cp -a squashfs-root/* ${pkgdir}/opt/${pkgname}/
-  rm -rf ${pkgdir}/opt/${pkgname}/{usr,OrcaSlicer.desktop,OrcaSlicer.png}
+  rm -rf ${pkgdir}/opt/${pkgname}/{usr,com.orcaslicer.OrcaSlicer.desktop,OrcaSlicer.png}
 
   install -d $pkgdir/usr/bin
   ln -s /opt/${pkgname}/AppRun ${pkgdir}/usr/bin/orca-slicer
 
-  install -Dm644 squashfs-root/OrcaSlicer.desktop ${pkgdir}/usr/share/applications/orca-slicer.desktop
+  install -Dm644 squashfs-root/com.orcaslicer.OrcaSlicer.desktop ${pkgdir}/usr/share/applications/orca-slicer.desktop
   sed -i '/^Exec=/ c\Exec=/opt/orca-slicer/AppRun %U' ${pkgdir}/usr/share/applications/orca-slicer.desktop
   sed -i '/^MimeType=/ s|$|x-scheme-handler/orcaslicer;x-scheme-handler/bambustudio;|' ${pkgdir}/usr/share/applications/orca-slicer.desktop
 
