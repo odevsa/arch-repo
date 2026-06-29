@@ -33,4 +33,6 @@ package() {
 
   install -d ${pkgdir}/usr/share/icons/
   cp -r squashfs-root/usr/share/icons/hicolor/ ${pkgdir}/usr/share/icons/
+
+  chmod +x ${pkgdir}/opt/${pkgname}/libexec/orca-slicer-env
 }
