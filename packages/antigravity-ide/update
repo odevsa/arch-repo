@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+set -euo pipefail
+source "packages/helpers"
+
+# Get latest version
+LATEST_VERSION=2.1.1
+LATEST_BUILD=6123990880747520
+
+update_version "$LATEST_VERSION" "$LATEST_BUILD"

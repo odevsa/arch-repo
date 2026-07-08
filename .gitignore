@@ -10,3 +10,6 @@ packages/*/*.rpm
 packages/*/*.AppImage
 packages/*/*.tar.*
 packages/*/*.part
+packages/*/*.desktop
+packages/*/*.png
+packages/*/*.xml

@@ -2,6 +2,7 @@
 
 update_version() {
   local LATEST_VERSION="$1"
+  local LATEST_BUILD="${2:-}"
   
   if [ -z "$LATEST_VERSION" ]; then
     exit 1
@@ -11,16 +12,23 @@ update_version() {
   local PACKAGE=$(basename "$DIRECTORY")
   local PKGBUILD_FILE="$DIRECTORY/PKGBUILD"
   local CURRENT_VERSION=$(grep -E '^pkgver=' "$PKGBUILD_FILE" | cut -d= -f2 | tr -d '"')
+  local CURRENT_BUILD=$(grep -E '^pkgbuild=' "$PKGBUILD_FILE" | cut -d= -f2 | tr -d '"' || true)
   
 
   # Apply update
-  if [ "$CURRENT_VERSION" != "$LATEST_VERSION" ]; then
+  if [ "$CURRENT_VERSION" != "$LATEST_VERSION" ] || { [ -n "$LATEST_BUILD" ] && [ "$CURRENT_BUILD" != "$LATEST_BUILD" ]; }; then
     pkgname="$PACKAGE"
     pkgver="$LATEST_VERSION"
+    pkgbuild="$LATEST_BUILD"
 
     # Update pkgver
     sed -i "s/^pkgver=.*/pkgver=${pkgver}/" "$PKGBUILD_FILE"
     echo "[${PACKAGE}] Updated: ${CURRENT_VERSION} -> ${pkgver}"
+
+    # Update pkgbuild if provided
+    if [ -n "$LATEST_BUILD" ]; then
+      sed -i "s/^pkgbuild=.*/pkgbuild=${LATEST_BUILD}/" "$PKGBUILD_FILE"
+    fi
     
     # Update sha256sums
     NEW_SHA256SUMS=()
@@ -31,7 +39,8 @@ update_version() {
         URL_PART=$RAW_FIRST
       fi
       EXPANDED=${URL_PART//\$\{pkgver\}/${pkgver}}
-      EXPANDED=${EXPANDED//\$\{pkgname\}/${PACKAGE}}
+      EXPANDED=${EXPANDED//\$\{pkgbuild\}/${pkgbuild}}
+      EXPANDED=${EXPANDED//\$\{pkgname\}/${pkgname}}
       HASH=""
       if printf '%s' "$EXPANDED" | grep -qE '^https?://'; then
         TMPFILE=$(mktemp)

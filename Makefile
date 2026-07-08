@@ -5,6 +5,8 @@ PKGBUILDS    := $(wildcard $(PACKAGES_DIR)/*/PKGBUILD)
 PACKAGES     := $(patsubst $(PACKAGES_DIR)/%/PKGBUILD,%,$(PKGBUILDS))
 IGNORED_PACKAGES := $(shell cat $(PACKAGES_DIR)/.ignore 2>/dev/null || true)
 
+CLEAN_EXTENSIONS := install sh zip deb rpm AppImage 'tar.*' part desktop png xml
+
 .PHONY: help build database update clean $(PACKAGES)
 
 $(PACKAGES):
@@ -12,14 +14,9 @@ $(PACKAGES):
 	@cp $(PACKAGES_DIR)/$@/sources/* $(PACKAGES_DIR)/$@ 2>/dev/null || true
 	cd $(PACKAGES_DIR)/$@ && makepkg -s --noconfirm -c
 	@mv $(PACKAGES_DIR)/$@/*.pkg.tar.zst $(OUTPUT_DIR)/ 2>/dev/null || true
-	@rm -f $(PACKAGES_DIR)/$@/*.install
-	@rm -f $(PACKAGES_DIR)/$@/*.sh
-	@rm -f $(PACKAGES_DIR)/$@/*.zip
-	@rm -f $(PACKAGES_DIR)/$@/*.deb
-	@rm -f $(PACKAGES_DIR)/$@/*.rpm
-	@rm -f $(PACKAGES_DIR)/$@/*.AppImage
-	@rm -f $(PACKAGES_DIR)/$@/*.tar.*
-	@rm -f $(PACKAGES_DIR)/$@/*.part
+	@for ext in $(CLEAN_EXTENSIONS); do \
+		rm -f $(PACKAGES_DIR)/$@/*.$$ext; \
+	done
 
 build: clean $(filter-out $(IGNORED_PACKAGES),$(PACKAGES)) database html
 
@@ -36,14 +33,13 @@ update:
 clean:
 	@rm -rf $(OUTPUT_DIR)
 	@rm -rf $(PACKAGES_DIR)/*/{src,pkg}
-	@rm -f $(PACKAGES_DIR)/*/*.install
-	@rm -f $(PACKAGES_DIR)/*/*.sh
-	@rm -f $(PACKAGES_DIR)/*/*.zip
-	@rm -f $(PACKAGES_DIR)/*/*.deb
-	@rm -f $(PACKAGES_DIR)/*/*.rpm
-	@rm -f $(PACKAGES_DIR)/*/*.AppImage
-	@rm -f $(PACKAGES_DIR)/*/*.tar.*
-	@rm -f $(PACKAGES_DIR)/*/*.part
+	@for pkgdir in $(PACKAGES_DIR)/*; do \
+		if [ -d $$pkgdir ]; then \
+			for ext in $(CLEAN_EXTENSIONS); do \
+				rm -f $$pkgdir/*.$$ext; \
+			done; \
+		fi; \
+	done
 
 html:
 	@echo "<html>" > $(OUTPUT_DIR)/index.html
