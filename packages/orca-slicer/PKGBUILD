@@ -1,5 +1,5 @@
 pkgname='orca-slicer'
-pkgver=2.4.1
+pkgver=2.4.2
 pkgrel=1
 pkgdesc="OrcaSlicer - A small open-source slicer for 3D printers"
 arch=('x86_64')
@@ -12,7 +12,7 @@ options=(!strip !zipman !debug)
 
 appimage="orca-slicer-${pkgver}.AppImage"
 source=("${appimage}::https://github.com/SoftFever/OrcaSlicer/releases/download/v${pkgver}/OrcaSlicer_Linux_AppImage_Ubuntu2404_V${pkgver}.AppImage")
-sha256sums=('7aff29a0ac6bb906f11c069eefe83459781c3364bac20ba9529eb9937a231402')
+sha256sums=('d12fb8c8eac1aecd2dfb6377acd48f994f8fa439ed5292fa532dd82880f029fd')
 
 prepare() {
   chmod +x ${appimage}
