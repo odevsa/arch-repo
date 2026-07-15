@@ -1,0 +1,24 @@
+pkgname=fresh
+pkgver=0.4.3
+pkgrel=1
+pkgdesc="Fresh - Code editor"
+arch=('x86_64')
+url="https://getfresh.dev/"
+license=('GPL-2.0-or-later')
+provides=("${pkgname}")
+conflicts=("${pkgname}")
+options=(!strip !debug)
+
+source=("${pkgname}-${pkgver}.deb::https://github.com/sinelaw/fresh/releases/download/v${pkgver}/fresh-editor_${pkgver}-1_amd64.deb")
+sha256sums=('923e8238061c8916944dedf8dfc88889c056d80473864bc4f0bd1c622d074c37')
+
+package() {
+  bsdtar -xf data.tar.xz -C "${pkgdir}/"
+
+  install -d "${pkgdir}/usr/bin"
+  install -d "${pkgdir}/usr/share/applications"
+  install -d "${pkgdir}/usr/share/doc"
+  install -d "${pkgdir}/usr/share/icons"
+  install -d "${pkgdir}/usr/share/lintian"
+  install -d "${pkgdir}/usr/share/man"
+}
