@@ -1,0 +1,26 @@
+pkgname=stl-thumb
+pkgver=0.5.0
+pkgrel=1
+pkgdesc="STL Thumb - A fast lightweight thumbnail generator for STL files"
+arch=('x86_64')
+url="https://github.com/unlimitedbacon/stl-thumb"
+license=('MIT')
+provides=("${pkgname}")
+conflicts=("${pkgname}")
+options=(!strip !debug)
+
+source=("${pkgname}-${pkgver}.deb::https://github.com/unlimitedbacon/stl-thumb/releases/download/v${pkgver}/stl-thumb_${pkgver}_amd64.deb")
+sha256sums=('1e8398aa5df875ce91494ec525fd4ad973bb27c6d47f696b25b8a202ef91240d')
+
+package() {
+  bsdtar -xf data.tar.xz -C "${pkgdir}/"
+
+  sed -i 's|^\(Exec=.*\)$|\1 -m 666666 666666 FFFFFF|' "${pkgdir}/usr/share/thumbnailers/stl-thumb.thumbnailer"
+
+  install -d "${pkgdir}/usr/bin"
+  install -d "${pkgdir}/usr/include"
+  install -d "${pkgdir}/usr/lib"
+  install -d "${pkgdir}/usr/share/doc"
+  install -d "${pkgdir}/usr/share/mime"
+  install -d "${pkgdir}/usr/share/thumbnailers"
+}

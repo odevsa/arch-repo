@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+set -euo pipefail
+source "packages/helpers"
+
+# Get latest version
+URL="https://api.github.com/repos/unlimitedbacon/stl-thumb/releases/latest"
+RESPONSE=$(curl -sSL "${URL}")
+COMPLETE_VERSION=$(printf '%s' "$RESPONSE" | sed -n 's/.*"tag_name"[[:space:]]*:[[:space:]]*"\([^\"]*\)".*/\1/p')
+LATEST_VERSION=${COMPLETE_VERSION#v}
+
+update_version "$LATEST_VERSION"
