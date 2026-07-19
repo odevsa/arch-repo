@@ -1,0 +1,17 @@
+pkgname=mesh
+pkgver=0.1.0
+pkgrel=1
+pkgdesc="Mesh - A lightweight 3D Mesh Viewer"
+arch=('x86_64')
+url="https://github.com/odevsa/mesh"
+license=('none')
+provides=("${pkgname}")
+conflicts=("${pkgname}")
+options=(!strip !debug)
+
+source=("${pkgname}-${pkgver}.deb::https://github.com/odevsa/mesh/releases/download/v${pkgver}/${pkgname}_${pkgver}_amd64.deb")
+sha256sums=('d970b5c3e0f4766cbefb922747fab082405f11143eb083233015cc0fac7fa3f2')
+
+package() {
+  bsdtar -xf data.tar.xz -C "${pkgdir}/"
+}
