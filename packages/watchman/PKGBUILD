@@ -14,16 +14,72 @@ options=(!strip)
 source=("${pkgname}-v${pkgver}-linux.zip::https://github.com/facebook/${pkgname}/releases/download/v${pkgver}/${pkgname}-v${pkgver}-linux.zip")
 sha256sums=('8738f787eee2c0b0e857910deb7f786ffac0351b01449b760a45319306374903')
 
+prepare() {
+  cd watchman-v$pkgver-linux
+
+  python <<END
+from pathlib import Path
+
+data = Path("bin/watchman").read_bytes()
+
+# Bad and good path must have same length
+badpath  = b"/usr/local/var/run/watchman\\x00"
+goodpath = b"/run/./././././././watchman\\x00"
+
+assert len(badpath) == len(goodpath)
+data = data.replace(badpath, goodpath)
+
+Path("bin/watchman").write_bytes(data)
+END
+
+  patchelf \
+    --replace-needed {/usr/local/lib/,}libgflags.so.2.3 \
+    --replace-needed {/usr/local/lib/,}libglog.so.1 \
+    --replace-needed {/usr/local/lib/,}libsnappy.so.1 \
+    bin/* lib/*
+
+  patchelf --set-rpath /usr/lib/watchman bin/* lib/*
+}
+
 package() {
-  cd "${srcdir}/${pkgname}-v${pkgver}-linux"
+  cd watchman-v$pkgver-linux
 
-  install -Dm755 "bin/${pkgname}" "$pkgdir/usr/local/bin/${pkgname}"
-  install -Dm755 "bin/${pkgname}ctl" "$pkgdir/usr/local/bin/${pkgname}ctl"
+  install -Dt "$pkgdir/usr/bin" bin/*
+  install -Dt "$pkgdir/usr/lib/watchman" lib/*
 
-  install -Dm644 "lib/libgflags.so.2.3" "$pkgdir/usr/local/lib/libgflags.so.2.3"
-  install -Dm644 "lib/libglog.so.1" "$pkgdir/usr/local/lib/libglog.so.1"
-  install -Dm644 "lib/libsnappy.so.1" "$pkgdir/usr/local/lib/libsnappy.so.1"
-  
-	mkdir -p "$pkgdir/usr/local/var/run/watchman"
-	chmod 2777 "$pkgdir/usr/local/var/run/watchman"
+  install -Dm644 /dev/stdin "$pkgdir/usr/lib/tmpfiles.d/watchman.conf" <<END
+d /run/watchman 1777 root root
+END
+
+  echo '{}' | install -Dm644 /dev/stdin "$pkgdir/etc/watchman.json.default"
+
+  install -Dm644 /dev/stdin "$pkgdir/usr/lib/systemd/user/watchman.socket" <<END
+[Unit]
+Description=File watching service socket
+Documentation=$url
+
+[Socket]
+ListenStream=/run/watchman/%u-state/sock
+SocketMode=0600
+DirectoryMode=0700
+
+[Install]
+WantedBy=sockets.target
+END
+
+  install -Dm644 /dev/stdin "$pkgdir/usr/lib/systemd/user/watchman.service" <<END
+[Unit]
+Description=File watching service
+Documentation=$url
+Requires=watchman.socket
+
+[Service]
+ExecStart=/usr/bin/watchman --foreground --inetd --logfile=-
+StandardInput=socket
+StandardOutput=journal
+StandardError=inherit
+
+[Install]
+WantedBy=default.target
+END
 }
