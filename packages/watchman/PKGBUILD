@@ -1,0 +1,29 @@
+pkgname=watchman
+pkgver=2026.07.20.00
+pkgrel=1
+pkgdesc="Watchman - A inotify-based file watching and job triggering command line utility"
+url="https://facebook.github.io/watchman/"
+arch=(x86_64)
+license=(MIT)
+depends=(glibc libgcc libstdc++ openssl)
+makedepends=(patchelf python)
+provides=("$pkgname")
+conflicts=("$pkgname")
+options=(!strip)
+
+source=("${pkgname}-v${pkgver}-linux.zip::https://github.com/facebook/${pkgname}/releases/download/v${pkgver}/${pkgname}-v${pkgver}-linux.zip")
+sha256sums=('8738f787eee2c0b0e857910deb7f786ffac0351b01449b760a45319306374903')
+
+package() {
+  cd "${srcdir}/${pkgname}-v${pkgver}-linux"
+
+  install -Dm755 "bin/${pkgname}" "$pkgdir/usr/local/bin/${pkgname}"
+  install -Dm755 "bin/${pkgname}ctl" "$pkgdir/usr/local/bin/${pkgname}ctl"
+
+  install -Dm644 "lib/libgflags.so.2.3" "$pkgdir/usr/local/lib/libgflags.so.2.3"
+  install -Dm644 "lib/libglog.so.1" "$pkgdir/usr/local/lib/libglog.so.1"
+  install -Dm644 "lib/libsnappy.so.1" "$pkgdir/usr/local/lib/libsnappy.so.1"
+  
+	mkdir -p "$pkgdir/usr/local/var/run/watchman"
+	chmod 2777 "$pkgdir/usr/local/var/run/watchman"
+}
