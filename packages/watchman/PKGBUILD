@@ -1,5 +1,5 @@
 pkgname=watchman
-pkgver=2026.07.20.00
+pkgver=2026.07.27.00
 pkgrel=1
 pkgdesc="Watchman - A inotify-based file watching and job triggering command line utility"
 url="https://facebook.github.io/watchman/"
@@ -12,7 +12,7 @@ conflicts=("$pkgname")
 options=(!strip)
 
 source=("${pkgname}-v${pkgver}-linux.zip::https://github.com/facebook/${pkgname}/releases/download/v${pkgver}/${pkgname}-v${pkgver}-linux.zip")
-sha256sums=('8738f787eee2c0b0e857910deb7f786ffac0351b01449b760a45319306374903')
+sha256sums=('e02227ea30fc07af4131f4c00b851d270dd231c24f86b670d46fa7c9aa95b022')
 
 prepare() {
   cd watchman-v$pkgver-linux
