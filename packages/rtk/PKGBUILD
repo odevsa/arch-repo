@@ -1,5 +1,5 @@
 pkgname=rtk
-pkgver=0.44.0
+pkgver=0.44.1
 pkgrel=1
 pkgdesc="RTK - High-performance CLI proxy that cuts up to 90% of the bash output your agent reads"
 arch=('x86_64')
@@ -10,7 +10,7 @@ conflicts=("${pkgname}")
 options=(!strip !debug)
 
 source=("${pkgname}-${pkgver}.tar.gz::https://github.com/rtk-ai/rtk/releases/download/v${pkgver}/rtk-x86_64-unknown-linux-musl.tar.gz")
-sha256sums=('3c3316cfc068e372432b415faeab73d46f8047750d488dd94d01d8d9f016a2a1')
+sha256sums=('986f29704469b3d1051e2474105c6c75ab8b73651068dcd61612c1fb3938ad95')
 
 package() {
   install -Dm755 rtk -t "${pkgdir}/usr/bin/"
