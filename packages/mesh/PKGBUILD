@@ -5,6 +5,7 @@ pkgdesc="Mesh - A lightweight 3D Mesh Viewer"
 arch=('x86_64')
 url="https://github.com/odevsa/mesh"
 license=('none')
+install=mesh.install
 provides=("${pkgname}")
 conflicts=("${pkgname}")
 options=(!strip !debug)
@@ -14,4 +15,15 @@ sha256sums=('80d4e4f529836a1286679e435220bcab433a9b556de6b950a4db5fb0ac22925e')
 
 package() {
   bsdtar -xf data.tar.xz -C "${pkgdir}/"
+
+  install -d "${pkgdir}/usr/share/applications"
+  
+  cat <<EOF >> "${pkgdir}/usr/share/applications/mimeapps.list"
+[Default Applications]
+model/stl=mesh.desktop;
+application/x-stl=mesh.desktop;
+model/obj=mesh.desktop;
+model/gltf+json=mesh.desktop;
+model/gltf-binary=mesh.desktop;
+EOF
 }
