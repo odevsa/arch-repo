@@ -1,5 +1,5 @@
 pkgname=mesh
-pkgver=0.1.1
+pkgver=0.1.2
 pkgrel=1
 pkgdesc="Mesh - A lightweight 3D Mesh Viewer"
 arch=('x86_64')
@@ -11,7 +11,7 @@ conflicts=("${pkgname}")
 options=(!strip !debug)
 
 source=("${pkgname}-${pkgver}.deb::https://github.com/odevsa/mesh/releases/download/v${pkgver}/${pkgname}_${pkgver}_amd64.deb")
-sha256sums=('80d4e4f529836a1286679e435220bcab433a9b556de6b950a4db5fb0ac22925e')
+sha256sums=('a1957683fb527c039b84220d1502b6ee6c5b496868be34fbf612807b7895d53a')
 
 package() {
   bsdtar -xf data.tar.xz -C "${pkgdir}/"
