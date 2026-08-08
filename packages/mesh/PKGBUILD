@@ -22,6 +22,7 @@ package() {
 [Default Applications]
 model/stl=mesh.desktop;
 application/x-stl=mesh.desktop;
+model/3mf=mesh.desktop;
 model/obj=mesh.desktop;
 model/gltf+json=mesh.desktop;
 model/gltf-binary=mesh.desktop;
