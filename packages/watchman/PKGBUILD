@@ -1,5 +1,5 @@
 pkgname=watchman
-pkgver=2026.08.17.00
+pkgver=2026.08.24.00
 pkgrel=1
 pkgdesc="Watchman - A inotify-based file watching and job triggering command line utility"
 url="https://facebook.github.io/watchman/"
