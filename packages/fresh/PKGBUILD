@@ -1,5 +1,5 @@
 pkgname=fresh
-pkgver=0.4.10
+pkgver=0.5.0
 pkgrel=1
 pkgdesc="Fresh - Code editor"
 arch=('x86_64')
@@ -10,7 +10,7 @@ conflicts=("${pkgname}")
 options=(!strip !debug)
 
 source=("${pkgname}-${pkgver}.deb::https://github.com/sinelaw/fresh/releases/download/v${pkgver}/fresh-editor_${pkgver}-1_amd64.deb")
-sha256sums=('fee115e636c0aeb2827e2b4b3624e16e2d05838f014753b2a3f730ec5e6e9139')
+sha256sums=('5bd8767607efef3ad18fc165c242f26d5b1c07d212b69b0c99d292b9abcf0cba')
 
 package() {
   bsdtar -xf data.tar.xz -C "${pkgdir}/"
