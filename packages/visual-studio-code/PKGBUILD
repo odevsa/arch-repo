@@ -1,5 +1,5 @@
 pkgname=visual-studio-code
-pkgver=1.136.2
+pkgver=1.137.0
 pkgrel=1
 pkgdesc="Visual Studio Code - Official Code editor from Microsoft"
 arch=('x86_64')
@@ -15,7 +15,7 @@ conflicts=('code')
 options=(!strip)
 
 source=("visual-studio-code-${pkgver}.deb::https://update.code.visualstudio.com/${pkgver}/linux-deb-x64/stable" "${pkgname}.sh")
-sha256sums=('2493226f723f66c8e83b9d806e3fbe83dcc43f381ece51eaa03d88889542b0c0' 'e31b377dddd35e0efaa50db0951792d898d67f85be8ca14a3913304391127c86')
+sha256sums=('fd4dff72c44598d3acb885b448256f5d82cf53f59538d97fc7d3c8d8d9d574d3' 'e31b377dddd35e0efaa50db0951792d898d67f85be8ca14a3913304391127c86')
 
 package() {
   bsdtar -xf data.tar.xz -C "${pkgdir}/"
