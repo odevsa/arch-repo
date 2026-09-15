@@ -1,0 +1,27 @@
+pkgname=libation
+pkgver=14.2.1
+pkgrel=1
+pkgdesc="Libation - Liberate your Library. An Audible audiobook manager"
+arch=('x86_64')
+url="https://github.com/rmcrackan/Libation"
+license=('GPL-3.0-only')
+depends=('fontconfig' 'gcc-libs' 'glibc' 'gtk3' 'hicolor-icon-theme' 'icu' 'webkit2gtk-4.1')
+provides=("${pkgname}")
+conflicts=("${pkgname}")
+options=(!strip !debug)
+
+source=("${pkgname}-${pkgver}.deb::https://github.com/rmcrackan/Libation/releases/download/v${pkgver}/Libation.${pkgver}-linux-chardonnay-amd64.deb")
+sha256sums=('d33d861eac7d2da35864785ada8f60b78228a91fcf733ffd73f41e607c82008d')
+
+package() {
+  bsdtar -xf data.tar.xz -C "${pkgdir}/"
+
+  install -d "${pkgdir}/usr/bin"
+  ln -s /usr/lib/libation/Libation "${pkgdir}/usr/bin/libation"
+  ln -s /usr/lib/libation/Hangover "${pkgdir}/usr/bin/hangover"
+  ln -s /usr/lib/libation/LibationCli "${pkgdir}/usr/bin/libationcli"
+
+  sed -i \
+    's|^Exec=env |Exec=env DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=0 |' \
+    "${pkgdir}/usr/share/applications/Libation.desktop"
+}
