@@ -52,8 +52,8 @@ jobs:
 
       - name: Build packages (incremental or full)
         run: |
-          git config --global --add safe.directory "$PWD"
-          su builder -c "git config --global --add safe.directory '$PWD'"
+          git config --global --add safe.directory "*"
+          su builder -c "git config --global --add safe.directory '*'"
 
           mkdir -p public
           chown -R builder:builder public/
@@ -68,16 +68,26 @@ jobs:
             su builder -c "make build"
           else
             echo ">> Cache found. Determining modified packages..."
+
             BEFORE_SHA="${{ github.event.before }}"
-            if [ -z "$BEFORE_SHA" ] || [ "$BEFORE_SHA" = "0000000000000000000000000000000000000000" ]; then
-              BEFORE_SHA=$(git rev-parse HEAD~1 2>/dev/null || true)
+            BASE_REF=""
+
+            if [ -n "$BEFORE_SHA" ] && [ "$BEFORE_SHA" != "0000000000000000000000000000000000000000" ] && git cat-file -e "${BEFORE_SHA}^{commit}" 2>/dev/null; then
+              BASE_REF="$BEFORE_SHA"
+            elif git cat-file -e "HEAD~1^{commit}" 2>/dev/null; then
+              BASE_REF="HEAD~1"
             fi
 
-            CHANGED_PKGS=""
-            if [ -n "$BEFORE_SHA" ]; then
-              CHANGED_PKGS=$(git diff --name-only "$BEFORE_SHA" HEAD -- packages/ | awk -F/ '{print $2}' | sort -u | grep -v '^\.' || true)
+            CHANGED_FILES=""
+            if [ -n "$BASE_REF" ]; then
+              echo ">> Comparing changes between $BASE_REF and HEAD..."
+              CHANGED_FILES=$(git diff --name-only "$BASE_REF" HEAD -- packages 2>/dev/null || true)
+            else
+              echo ">> Inspecting changes in HEAD commit..."
+              CHANGED_FILES=$(git diff-tree --no-commit-id --name-only -r HEAD -- packages 2>/dev/null || true)
             fi
 
+            CHANGED_PKGS=$(echo "$CHANGED_FILES" | awk -F/ '{print $2}' | sort -u | grep -v '^\.' || true)
             IGNORED_PKGS=$(cat packages/.ignore 2>/dev/null || true)
             PKGS_TO_BUILD=""
             for p in $CHANGED_PKGS; do
