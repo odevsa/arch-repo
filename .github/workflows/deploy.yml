@@ -1,9 +1,16 @@
-name: Build e Publish Arch Repo
+name: Build and Publish Arch Repo
 
 on:
   push:
     branches:
       - main
+  workflow_dispatch:
+    inputs:
+      force_rebuild_all:
+        description: "Force rebuild of all packages"
+        required: false
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -18,22 +25,82 @@ jobs:
       options: --privileged
 
     steps:
-      - name: Checkout of the repository
+      - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Restore/Save packages cache
+        uses: actions/cache@v4
+        id: packages-cache
+        with:
+          path: public/
+          key: arch-repo-packages-${{ github.run_id }}
+          restore-keys: |
+            arch-repo-packages-
 
       - name: Initialize Arch environment
         run: |
-          pacman -Syu --noconfirm --needed base-devel git
+          pacman -Syu --noconfirm --needed base-devel git pacman-contrib
 
       - name: Configure non-root user (makepkg does not run as root)
         run: |
-          useradd -m builder
+          useradd -m builder 2>/dev/null || true
           echo "builder ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+          mkdir -p public
           chown -R builder:builder ./
 
-      - name: Build all packages via Makefile
+      - name: Build packages (incremental or full)
         run: |
-          su builder -c "make build"
+          git config --global --add safe.directory "$PWD"
+          su builder -c "git config --global --add safe.directory '$PWD'"
+
+          mkdir -p public
+          chown -R builder:builder public/
+
+          EXISTING_PACKAGES=$(find public -name "*.pkg.tar.zst" 2>/dev/null | wc -l)
+          FORCE_REBUILD="${{ inputs.force_rebuild_all }}"
+
+          echo "Packages found in cache: $EXISTING_PACKAGES"
+
+          if [ "$FORCE_REBUILD" = "true" ] || [ "$EXISTING_PACKAGES" -eq 0 ]; then
+            echo ">> Performing full rebuild of all packages..."
+            su builder -c "make build"
+          else
+            echo ">> Cache found. Determining modified packages..."
+            BEFORE_SHA="${{ github.event.before }}"
+            if [ -z "$BEFORE_SHA" ] || [ "$BEFORE_SHA" = "0000000000000000000000000000000000000000" ]; then
+              BEFORE_SHA=$(git rev-parse HEAD~1 2>/dev/null || true)
+            fi
+
+            CHANGED_PKGS=""
+            if [ -n "$BEFORE_SHA" ]; then
+              CHANGED_PKGS=$(git diff --name-only "$BEFORE_SHA" HEAD -- packages/ | awk -F/ '{print $2}' | sort -u | grep -v '^\.' || true)
+            fi
+
+            IGNORED_PKGS=$(cat packages/.ignore 2>/dev/null || true)
+            PKGS_TO_BUILD=""
+            for p in $CHANGED_PKGS; do
+              if [ -d "packages/$p" ] && [ -f "packages/$p/PKGBUILD" ]; then
+                if ! echo "$IGNORED_PKGS" | grep -qw "$p"; then
+                  PKGS_TO_BUILD="$PKGS_TO_BUILD $p"
+                fi
+              fi
+            done
+
+            if [ -n "$PKGS_TO_BUILD" ]; then
+              echo ">> Packages to build:$PKGS_TO_BUILD"
+              su builder -c "make $PKGS_TO_BUILD"
+            else
+              echo ">> No packages in 'packages/' were modified in this commit."
+            fi
+
+            # Remove obsolete versions of updated packages
+            paccache -r -k1 -c public/ || true
+
+            # Update repository database and HTML index
+            su builder -c "make database html"
+          fi
 
       - name: Upload artifact to GitHub Pages
         uses: actions/upload-pages-artifact@v3

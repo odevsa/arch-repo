@@ -21,7 +21,7 @@ $(PACKAGES):
 build: clean $(filter-out $(IGNORED_PACKAGES),$(PACKAGES)) database html
 
 database:
-	cd $(OUTPUT_DIR) && repo-add $(REPO_NAME).db.tar.gz *.pkg.tar.zst
+	cd $(OUTPUT_DIR) && rm -f $(REPO_NAME).db* $(REPO_NAME).files* && repo-add $(REPO_NAME).db.tar.gz *.pkg.tar.zst
 
 update:
 	@for pkg in $(PACKAGES); do \
@@ -48,9 +48,11 @@ html:
 	@echo "<link rel=\"icon\" type=\"image/png\" href=\"https://archlinux.org/static/archlinux_common_style/favicon.png\" />" >> $(OUTPUT_DIR)/index.html
 	@echo "</head>" >> $(OUTPUT_DIR)/index.html
 	@echo "<body>" >> $(OUTPUT_DIR)/index.html
-	@for pkg in $(wildcard $(OUTPUT_DIR)/*.pkg.tar.zst); do \
-		pkgname=$$(basename $$pkg); \
-		echo "<a href=\"$$pkgname\">$$pkgname</a><br />" >> $(OUTPUT_DIR)/index.html; \
+	@for pkg in $(OUTPUT_DIR)/*.pkg.tar.zst; do \
+		if [ -f "$$pkg" ]; then \
+			pkgname=$$(basename "$$pkg"); \
+			echo "<a href=\"$$pkgname\">$$pkgname</a><br />" >> $(OUTPUT_DIR)/index.html; \
+		fi; \
 	done
 	@echo "</body>" >> $(OUTPUT_DIR)/index.html
 	@echo "</html>" >> $(OUTPUT_DIR)/index.html
