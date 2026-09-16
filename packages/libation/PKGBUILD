@@ -1,5 +1,5 @@
 pkgname=libation
-pkgver=14.2.1
+pkgver=14.2.2
 pkgrel=1
 pkgdesc="Libation - Liberate your Library. An Audible audiobook manager"
 arch=('x86_64')
@@ -11,7 +11,7 @@ conflicts=("${pkgname}")
 options=(!strip !debug)
 
 source=("${pkgname}-${pkgver}.deb::https://github.com/rmcrackan/Libation/releases/download/v${pkgver}/Libation.${pkgver}-linux-chardonnay-amd64.deb")
-sha256sums=('d33d861eac7d2da35864785ada8f60b78228a91fcf733ffd73f41e607c82008d')
+sha256sums=('8193049ef4ef7818eb20799b7086751a308bbacbf0fe390d94d8806862233e45')
 
 package() {
   bsdtar -xf data.tar.xz -C "${pkgdir}/"
