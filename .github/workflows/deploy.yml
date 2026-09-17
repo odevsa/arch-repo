@@ -139,6 +139,23 @@ jobs:
               echo ">> No packages need to be built."
             fi
 
+            # Remove binaries of ignored packages from public/ so the database excludes them
+            for p in $IGNORED_PKGS; do
+              [ -n "$p" ] || continue
+              if [ -d "packages/$p" ] && [ -f "packages/$p/PKGBUILD" ]; then
+                PKG_FILES=$(su builder -c "cd packages/$p && makepkg --packagelist 2>/dev/null" || true)
+                for f in $PKG_FILES; do
+                  fname=$(basename "$f")
+                  if [ -f "public/$fname" ]; then
+                    echo ">> Removing ignored package file 'public/$fname'..."
+                    rm -f "public/$fname"
+                  fi
+                done
+              else
+                rm -f public/"$p"-*.pkg.tar.zst
+              fi
+            done
+
             # Remove obsolete versions of updated packages
             paccache -r -k1 -c public/ || true
 
@@ -166,8 +183,29 @@ jobs:
           echo ">> Uploading database files to release..."
           gh release upload packages public/odevsa.db.tar.gz public/odevsa.db public/odevsa.files.tar.gz public/odevsa.files --clobber
 
-          # Fetch already uploaded assets to skip re-uploading existing packages
+          # Fetch already uploaded assets to manage release contents
           EXISTING_ASSETS=$(gh release view packages --json assets -q '.assets[].name' 2>/dev/null || true)
+
+          # Delete assets of ignored packages from GitHub Release
+          IGNORED_PKGS=$(cat packages/.ignore 2>/dev/null || true)
+          for p in $IGNORED_PKGS; do
+            [ -n "$p" ] || continue
+            if [ -d "packages/$p" ] && [ -f "packages/$p/PKGBUILD" ]; then
+              PKG_FILES=$(su builder -c "cd packages/$p && makepkg --packagelist 2>/dev/null" || true)
+              for f in $PKG_FILES; do
+                fname=$(basename "$f")
+                if echo "$EXISTING_ASSETS" | grep -qx "$fname"; then
+                  echo ">> Deleting ignored asset '$fname' from GitHub Release..."
+                  gh release delete-asset packages "$fname" -y || true
+                fi
+              done
+            else
+              for asset in $(echo "$EXISTING_ASSETS" | grep -E "^${p}-" || true); do
+                echo ">> Deleting ignored asset '$asset' from GitHub Release..."
+                gh release delete-asset packages "$asset" -y || true
+              done
+            fi
+          done
 
           # Upload packages not yet present in the release
           for pkg in public/*.pkg.tar.zst; do
