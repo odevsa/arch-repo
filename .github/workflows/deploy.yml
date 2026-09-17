@@ -79,11 +79,14 @@ jobs:
             CHANGED_FILES=""
             if [ -n "$BASE_REF" ]; then
               echo ">> Comparing changes between $BASE_REF and HEAD..."
-              CHANGED_FILES=$(git diff --name-only "$BASE_REF" HEAD -- packages 2>/dev/null || true)
+              CHANGED_FILES=$(git -c safe.directory="*" diff --name-only "$BASE_REF" HEAD -- packages 2>/dev/null || git diff --name-only "$BASE_REF" HEAD -- packages || true)
             else
               echo ">> Inspecting changes in HEAD commit..."
-              CHANGED_FILES=$(git diff-tree --no-commit-id --name-only -r HEAD -- packages 2>/dev/null || true)
+              CHANGED_FILES=$(git -c safe.directory="*" diff-tree --no-commit-id --name-only -r HEAD -- packages 2>/dev/null || git diff-tree --no-commit-id --name-only -r HEAD -- packages || true)
             fi
+
+            echo ">> Detected changed files in packages/:"
+            echo "$CHANGED_FILES"
 
             CHANGED_PKGS=$(echo "$CHANGED_FILES" | awk -F/ '{print $2}' | sort -u | grep -v '^\.' || true)
             IGNORED_PKGS=$(cat packages/.ignore 2>/dev/null || true)
@@ -91,12 +94,13 @@ jobs:
             for p in $CHANGED_PKGS; do
               if [ -d "packages/$p" ] && [ -f "packages/$p/PKGBUILD" ]; then
                 if ! echo "$IGNORED_PKGS" | grep -qw "$p"; then
+                  echo ">> Marking changed package '$p' for rebuild."
                   PKGS_TO_BUILD="$PKGS_TO_BUILD $p"
                 fi
               fi
             done
 
-            # Check for any package that is missing or not yet built in public/
+            # Verify every active package: if expected version is not in public/, mark for build
             for pkgdir in packages/*; do
               [ -d "$pkgdir" ] || continue
               p=$(basename "$pkgdir")
@@ -110,25 +114,16 @@ jobs:
                 continue
               fi
 
-              EXPECTED_FILES=$(su builder -c "cd packages/$p && makepkg --packagelist 2>/dev/null" || true)
-              MISSING=false
-              if [ -n "$EXPECTED_FILES" ]; then
-                for f in $EXPECTED_FILES; do
-                  fname=$(basename "$f")
-                  if [ ! -f "public/$fname" ]; then
-                    MISSING=true
-                    break
-                  fi
-                done
-              else
-                if ! ls public/"$p"-*.pkg.tar.zst >/dev/null 2>&1; then
-                  MISSING=true
-                fi
-              fi
+              # Extract version from PKGBUILD
+              PKG_VER=$(sed -n -E 's/^[[:space:]]*pkgver=([^#[:space:]]+).*/\1/p' "packages/$p/PKGBUILD" | tr -d "'\"" | head -n1)
+              PKG_REL=$(sed -n -E 's/^[[:space:]]*pkgrel=([^#[:space:]]+).*/\1/p' "packages/$p/PKGBUILD" | tr -d "'\"" | head -n1)
 
-              if [ "$MISSING" = "true" ]; then
-                echo ">> Package '$p' is missing from cache/public. Adding to build list."
-                PKGS_TO_BUILD="$PKGS_TO_BUILD $p"
+              if [ -n "$PKG_VER" ] && [ -n "$PKG_REL" ]; then
+                MATCHING=$(find public -maxdepth 1 -name "*${PKG_VER}-${PKG_REL}*.pkg.tar.zst" 2>/dev/null | grep -E "(^|/)${p}-${PKG_VER}-${PKG_REL}" || true)
+                if [ -z "$MATCHING" ]; then
+                  echo ">> Package '$p' version ${PKG_VER}-${PKG_REL} is not present in cache. Adding to build list."
+                  PKGS_TO_BUILD="$PKGS_TO_BUILD $p"
+                fi
               fi
             done
 
@@ -142,21 +137,10 @@ jobs:
             # Remove binaries of ignored packages from public/ so the database excludes them
             for p in $IGNORED_PKGS; do
               [ -n "$p" ] || continue
-              if [ -d "packages/$p" ] && [ -f "packages/$p/PKGBUILD" ]; then
-                PKG_FILES=$(su builder -c "cd packages/$p && makepkg --packagelist 2>/dev/null" || true)
-                for f in $PKG_FILES; do
-                  fname=$(basename "$f")
-                  if [ -f "public/$fname" ]; then
-                    echo ">> Removing ignored package file 'public/$fname'..."
-                    rm -f "public/$fname"
-                  fi
-                done
-              else
-                rm -f public/"$p"-*.pkg.tar.zst
-              fi
+              rm -f public/"$p"-*.pkg.tar.zst
             done
 
-            # Remove obsolete versions of updated packages
+            # Remove obsolete versions of updated packages from public/
             paccache -r -k1 -c public/ || true
 
             # Update repository database
@@ -186,25 +170,16 @@ jobs:
           # Fetch already uploaded assets to manage release contents
           EXISTING_ASSETS=$(gh release view packages --json assets -q '.assets[].name' 2>/dev/null || true)
 
-          # Delete assets of ignored packages from GitHub Release
-          IGNORED_PKGS=$(cat packages/.ignore 2>/dev/null || true)
-          for p in $IGNORED_PKGS; do
-            [ -n "$p" ] || continue
-            if [ -d "packages/$p" ] && [ -f "packages/$p/PKGBUILD" ]; then
-              PKG_FILES=$(su builder -c "cd packages/$p && makepkg --packagelist 2>/dev/null" || true)
-              for f in $PKG_FILES; do
-                fname=$(basename "$f")
-                if echo "$EXISTING_ASSETS" | grep -qx "$fname"; then
-                  echo ">> Deleting ignored asset '$fname' from GitHub Release..."
-                  gh release delete-asset packages "$fname" -y || true
+          # Delete obsolete and ignored assets from GitHub Release (assets no longer in public/)
+          for asset in $EXISTING_ASSETS; do
+            case "$asset" in
+              *.pkg.tar.zst)
+                if [ ! -f "public/$asset" ]; then
+                  echo ">> Deleting obsolete asset '$asset' from GitHub Release..."
+                  gh release delete-asset packages "$asset" -y || true
                 fi
-              done
-            else
-              for asset in $(echo "$EXISTING_ASSETS" | grep -E "^${p}-" || true); do
-                echo ">> Deleting ignored asset '$asset' from GitHub Release..."
-                gh release delete-asset packages "$asset" -y || true
-              done
-            fi
+                ;;
+            esac
           done
 
           # Upload packages not yet present in the release
