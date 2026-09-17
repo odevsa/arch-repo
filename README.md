@@ -4,10 +4,10 @@
 
 **[Repository](https://github.com/odevsa/arch-repo/releases/tag/packages)**
 
-[![Arch Linux](https://img.shields.io/badge/Arch%20Linux-Repository-1793d1?logo=arch-linux&logoColor=white&style=flat-square)](https://archlinux.org)
-[![Build and Release](https://img.shields.io/github/actions/workflow/status/odevsa/arch-repo/deploy.yml?branch=main&label=build&logo=githubactions&logoColor=white&style=flat-square)](https://github.com/odevsa/arch-repo/actions/workflows/deploy.yml)
-[![Release](https://img.shields.io/github/v/release/odevsa/arch-repo?include_prereleases&label=release&logo=github&style=flat-square)](https://github.com/odevsa/arch-repo/releases/tag/packages)
-[![Last Commit](https://img.shields.io/github/last-commit/odevsa/arch-repo?label=last%20update&logo=git&style=flat-square)](https://github.com/odevsa/arch-repo/commits/main)
+[![Arch Linux](https://img.shields.io/badge/Repository-Arch%20Linux-1793d1?logo=arch-linux&logoColor=white&style=flat-square)](https://archlinux.org)
+[![Release](https://img.shields.io/github/v/release/odevsa/arch-repo?include_prereleases&label=Release&logo=github&style=flat-square)](https://github.com/odevsa/arch-repo/releases/tag/packages)
+[![Last Commit](https://img.shields.io/github/last-commit/odevsa/arch-repo?label=Updated%20at&logo=googlecalendar&logoColor=white&style=flat-square)](https://github.com/odevsa/arch-repo/commits/main)
+[![Build and Release](https://img.shields.io/github/actions/workflow/status/odevsa/arch-repo/deploy.yml?branch=main&label=Build&logo=githubactions&logoColor=white&style=flat-square)](https://github.com/odevsa/arch-repo/actions/workflows/deploy.yml)
 
 </div>
 
