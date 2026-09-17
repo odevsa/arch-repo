@@ -96,11 +96,47 @@ jobs:
               fi
             done
 
+            # Check for any package that is missing or not yet built in public/
+            for pkgdir in packages/*; do
+              [ -d "$pkgdir" ] || continue
+              p=$(basename "$pkgdir")
+              [ -f "packages/$p/PKGBUILD" ] || continue
+
+              if echo "$IGNORED_PKGS" | grep -qw "$p"; then
+                continue
+              fi
+
+              if echo "$PKGS_TO_BUILD" | grep -qw "$p"; then
+                continue
+              fi
+
+              EXPECTED_FILES=$(su builder -c "cd packages/$p && makepkg --packagelist 2>/dev/null" || true)
+              MISSING=false
+              if [ -n "$EXPECTED_FILES" ]; then
+                for f in $EXPECTED_FILES; do
+                  fname=$(basename "$f")
+                  if [ ! -f "public/$fname" ]; then
+                    MISSING=true
+                    break
+                  fi
+                done
+              else
+                if ! ls public/"$p"-*.pkg.tar.zst >/dev/null 2>&1; then
+                  MISSING=true
+                fi
+              fi
+
+              if [ "$MISSING" = "true" ]; then
+                echo ">> Package '$p' is missing from cache/public. Adding to build list."
+                PKGS_TO_BUILD="$PKGS_TO_BUILD $p"
+              fi
+            done
+
             if [ -n "$PKGS_TO_BUILD" ]; then
               echo ">> Packages to build:$PKGS_TO_BUILD"
               su builder -c "make $PKGS_TO_BUILD"
             else
-              echo ">> No packages in 'packages/' were modified in this commit."
+              echo ">> No packages need to be built."
             fi
 
             # Remove obsolete versions of updated packages
