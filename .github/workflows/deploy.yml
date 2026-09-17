@@ -124,8 +124,9 @@ jobs:
           fi
 
           # Upload database files with resolved symlinks
-          cp -L public/odevsa.db.tar.gz public/odevsa.db
-          cp -L public/odevsa.files.tar.gz public/odevsa.files
+          rm -f public/odevsa.db public/odevsa.files
+          cp public/odevsa.db.tar.gz public/odevsa.db
+          cp public/odevsa.files.tar.gz public/odevsa.files
           echo ">> Uploading database files to release..."
           gh release upload packages public/odevsa.db.tar.gz public/odevsa.db public/odevsa.files.tar.gz public/odevsa.files --clobber
 
