@@ -1,6 +1,6 @@
 # arch-repo
 
-Repository: https://odevsa.github.io/arch-repo
+Repository: https://github.com/odevsa/arch-repo/releases/tag/packages
 
 ### Overview
 
@@ -14,7 +14,6 @@ See the `Makefile` at the repository root for available targets. Typical usage:
 - `make <packages>`: Build specific packages
 - `make update`: Update all packages versions
 - `make clean`: Remove built packages and output directories
-- `make html`: Generate HTML index of packages
 - `make help`: Show this help message
 
 Check the `Makefile` to see the exact target names and behaviors.
@@ -23,10 +22,10 @@ Check the `Makefile` to see the exact target names and behaviors.
 
 Add the following to `/etc/pacman.conf`:
 
-```
+```ini
 [odevsa]
 SigLevel = Optional TrustAll
-Server = https://odevsa.github.io/arch-repo
+Server = https://github.com/odevsa/arch-repo/releases/download/packages
 ```
 
 Then refresh the package databases and install packages:

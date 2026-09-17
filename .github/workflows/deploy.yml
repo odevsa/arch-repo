@@ -1,4 +1,4 @@
-name: Build and Publish Arch Repo
+name: Build and Release Arch Repo
 
 on:
   push:
@@ -14,11 +14,9 @@ on:
 
 permissions:
   contents: write
-  pages: write
-  id-token: write
 
 jobs:
-  build:
+  build-and-release:
     runs-on: ubuntu-latest
     container:
       image: archlinux:latest
@@ -41,7 +39,7 @@ jobs:
 
       - name: Initialize Arch environment
         run: |
-          pacman -Syu --noconfirm --needed base-devel git pacman-contrib
+          pacman -Syu --noconfirm --needed base-devel git pacman-contrib github-cli
 
       - name: Configure non-root user (makepkg does not run as root)
         run: |
@@ -108,22 +106,35 @@ jobs:
             # Remove obsolete versions of updated packages
             paccache -r -k1 -c public/ || true
 
-            # Update repository database and HTML index
-            su builder -c "make database html"
+            # Update repository database
+            su builder -c "make database"
           fi
 
-      - name: Upload artifact to GitHub Pages
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: public/
+      - name: Publish binaries to GitHub Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Ensure continuous release 'packages' exists
+          if ! gh release view packages >/dev/null 2>&1; then
+            echo ">> Creating 'packages' release..."
+            gh release create packages --title "Arch Linux Packages" --notes "Automated repository package storage"
+          fi
 
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+          # Upload database files with resolved symlinks
+          cp -L public/odevsa.db.tar.gz public/odevsa.db
+          cp -L public/odevsa.files.tar.gz public/odevsa.files
+          echo ">> Uploading database files to release..."
+          gh release upload packages public/odevsa.db.tar.gz public/odevsa.db public/odevsa.files.tar.gz public/odevsa.files --clobber
+
+          # Fetch already uploaded assets to skip re-uploading existing packages
+          EXISTING_ASSETS=$(gh release view packages --json assets -q '.assets[].name' 2>/dev/null || true)
+
+          # Upload packages not yet present in the release
+          for pkg in public/*.pkg.tar.zst; do
+            [ -f "$pkg" ] || continue
+            pkgname=$(basename "$pkg")
+            if ! echo "$EXISTING_ASSETS" | grep -qx "$pkgname"; then
+              echo ">> Uploading $pkgname to GitHub Release..."
+              gh release upload packages "$pkg" --clobber
+            fi
+          done

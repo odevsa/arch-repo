@@ -18,7 +18,7 @@ $(PACKAGES):
 		rm -f $(PACKAGES_DIR)/$@/*.$$ext; \
 	done
 
-build: clean $(filter-out $(IGNORED_PACKAGES),$(PACKAGES)) database html
+build: clean $(filter-out $(IGNORED_PACKAGES),$(PACKAGES)) database
 
 database:
 	cd $(OUTPUT_DIR) && rm -f $(REPO_NAME).db* $(REPO_NAME).files* && repo-add $(REPO_NAME).db.tar.gz *.pkg.tar.zst
@@ -41,22 +41,6 @@ clean:
 		fi; \
 	done
 
-html:
-	@echo "<html>" > $(OUTPUT_DIR)/index.html
-	@echo "<head>" >> $(OUTPUT_DIR)/index.html
-	@echo "<title>Arch Repo</title>" >> $(OUTPUT_DIR)/index.html
-	@echo "<link rel=\"icon\" type=\"image/png\" href=\"https://archlinux.org/static/archlinux_common_style/favicon.png\" />" >> $(OUTPUT_DIR)/index.html
-	@echo "</head>" >> $(OUTPUT_DIR)/index.html
-	@echo "<body>" >> $(OUTPUT_DIR)/index.html
-	@for pkg in $(OUTPUT_DIR)/*.pkg.tar.zst; do \
-		if [ -f "$$pkg" ]; then \
-			pkgname=$$(basename "$$pkg"); \
-			echo "<a href=\"$$pkgname\">$$pkgname</a><br />" >> $(OUTPUT_DIR)/index.html; \
-		fi; \
-	done
-	@echo "</body>" >> $(OUTPUT_DIR)/index.html
-	@echo "</html>" >> $(OUTPUT_DIR)/index.html
-
 help:
 	@echo "Usage: make <target>"
 	@echo
@@ -64,7 +48,6 @@ help:
 	@echo "  build        Build all packages and update repo database"
 	@echo "  update       Update all packages versions"
 	@echo "  clean        Remove built packages and output directories"
-	@echo "  html         Generate HTML index of packages"
 	@echo "  help         Show this help message"
 	@echo "  <packages>   Build specific packages (see below)"
 	@echo
