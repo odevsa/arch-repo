@@ -112,12 +112,15 @@ jobs:
 
       - name: Publish binaries to GitHub Release
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
         run: |
+          git config --global --add safe.directory "*"
+
           # Ensure continuous release 'packages' exists
           if ! gh release view packages >/dev/null 2>&1; then
             echo ">> Creating 'packages' release..."
-            gh release create packages --title "Arch Linux Packages" --notes "Automated repository package storage"
+            gh release create packages --target "$GITHUB_SHA" --title "Arch Linux Packages" --notes "Automated repository package storage"
           fi
 
           # Upload database files with resolved symlinks
