@@ -20,7 +20,7 @@ This repository contains packaging metadata and binaries for Arch Linux packages
 See the `Makefile` at the repository root for available targets. Typical usage:
 
 - `make build`: Build all packages and update repo database
-- `make <packages>`: Build specific packages
+- `make <packages>`: Build a specific packages
 - `make update`: Update all packages versions
 - `make clean`: Remove built packages and output directories
 - `make help`: Show this help message
