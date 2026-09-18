@@ -28,15 +28,6 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Restore/Save packages cache
-        uses: actions/cache@v4
-        id: packages-cache
-        with:
-          path: public/
-          key: arch-repo-packages-${{ github.run_id }}
-          restore-keys: |
-            arch-repo-packages-
-
       - name: Initialize Arch environment
         run: |
           pacman -Syu --noconfirm --needed base-devel git pacman-contrib github-cli
@@ -48,7 +39,10 @@ jobs:
           mkdir -p public
           chown -R builder:builder ./
 
-      - name: Build packages (incremental or full)
+      - name: Process repository packages
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
         run: |
           git config --global --add safe.directory "*"
           su builder -c "git config --global --add safe.directory '*'"
@@ -56,138 +50,155 @@ jobs:
           mkdir -p public
           chown -R builder:builder public/
 
-          EXISTING_PACKAGES=$(find public -name "*.pkg.tar.zst" 2>/dev/null | wc -l)
-          FORCE_REBUILD="${{ inputs.force_rebuild_all }}"
-
-          echo "Packages found in cache: $EXISTING_PACKAGES"
-
-          if [ "$FORCE_REBUILD" = "true" ] || [ "$EXISTING_PACKAGES" -eq 0 ]; then
-            echo ">> Performing full rebuild of all packages..."
-            su builder -c "make build"
-          else
-            echo ">> Cache found. Determining modified packages..."
-
-            BEFORE_SHA="${{ github.event.before }}"
-            BASE_REF=""
-
-            if [ -n "$BEFORE_SHA" ] && [ "$BEFORE_SHA" != "0000000000000000000000000000000000000000" ] && git cat-file -e "${BEFORE_SHA}^{commit}" 2>/dev/null; then
-              BASE_REF="$BEFORE_SHA"
-            elif git cat-file -e "HEAD~1^{commit}" 2>/dev/null; then
-              BASE_REF="HEAD~1"
-            fi
-
-            CHANGED_FILES=""
-            if [ -n "$BASE_REF" ]; then
-              echo ">> Comparing changes between $BASE_REF and HEAD..."
-              CHANGED_FILES=$(git -c safe.directory="*" diff --name-only "$BASE_REF" HEAD -- packages 2>/dev/null || git diff --name-only "$BASE_REF" HEAD -- packages || true)
-            else
-              echo ">> Inspecting changes in HEAD commit..."
-              CHANGED_FILES=$(git -c safe.directory="*" diff-tree --no-commit-id --name-only -r HEAD -- packages 2>/dev/null || git diff-tree --no-commit-id --name-only -r HEAD -- packages || true)
-            fi
-
-            echo ">> Detected changed files in packages/:"
-            echo "$CHANGED_FILES"
-
-            CHANGED_PKGS=$(echo "$CHANGED_FILES" | awk -F/ '{print $2}' | sort -u | grep -v '^\.' || true)
-            IGNORED_PKGS=$(cat packages/.ignore 2>/dev/null || true)
-            PKGS_TO_BUILD=""
-            for p in $CHANGED_PKGS; do
-              if [ -d "packages/$p" ] && [ -f "packages/$p/PKGBUILD" ]; then
-                if ! echo "$IGNORED_PKGS" | grep -qw "$p"; then
-                  echo ">> Marking changed package '$p' for rebuild."
-                  PKGS_TO_BUILD="$PKGS_TO_BUILD $p"
-                fi
-              fi
-            done
-
-            # Verify every active package: if expected version is not in public/, mark for build
-            for pkgdir in packages/*; do
-              [ -d "$pkgdir" ] || continue
-              p=$(basename "$pkgdir")
-              [ -f "packages/$p/PKGBUILD" ] || continue
-
-              if echo "$IGNORED_PKGS" | grep -qw "$p"; then
-                continue
-              fi
-
-              if echo "$PKGS_TO_BUILD" | grep -qw "$p"; then
-                continue
-              fi
-
-              # Extract version from PKGBUILD
-              PKG_VER=$(sed -n -E 's/^[[:space:]]*pkgver=([^#[:space:]]+).*/\1/p' "packages/$p/PKGBUILD" | tr -d "'\"" | head -n1)
-              PKG_REL=$(sed -n -E 's/^[[:space:]]*pkgrel=([^#[:space:]]+).*/\1/p' "packages/$p/PKGBUILD" | tr -d "'\"" | head -n1)
-
-              if [ -n "$PKG_VER" ] && [ -n "$PKG_REL" ]; then
-                MATCHING=$(find public -maxdepth 1 -name "*${PKG_VER}-${PKG_REL}*.pkg.tar.zst" 2>/dev/null | grep -E "(^|/)${p}-${PKG_VER}-${PKG_REL}" || true)
-                if [ -z "$MATCHING" ]; then
-                  echo ">> Package '$p' version ${PKG_VER}-${PKG_REL} is not present in cache. Adding to build list."
-                  PKGS_TO_BUILD="$PKGS_TO_BUILD $p"
-                fi
-              fi
-            done
-
-            if [ -n "$PKGS_TO_BUILD" ]; then
-              echo ">> Packages to build:$PKGS_TO_BUILD"
-              su builder -c "make $PKGS_TO_BUILD"
-            else
-              echo ">> No packages need to be built."
-            fi
-
-            # Remove binaries of ignored packages from public/ so the database excludes them
-            for p in $IGNORED_PKGS; do
-              [ -n "$p" ] || continue
-              rm -f public/"$p"-*.pkg.tar.zst
-            done
-
-            # Remove obsolete versions of updated packages from public/
-            paccache -r -k1 -c public/ || true
-
-            # Update repository database
-            su builder -c "make database"
-          fi
-
-      - name: Publish binaries to GitHub Release
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GH_REPO: ${{ github.repository }}
-        run: |
-          git config --global --add safe.directory "*"
-
-          # Ensure continuous release 'packages' exists
+          # 1. Ensure the continuous release 'packages' exists
           if ! gh release view packages >/dev/null 2>&1; then
             echo ">> Creating 'packages' release..."
             gh release create packages --target "$GITHUB_SHA" --title "Arch Linux Packages" --notes "Automated repository package storage"
           fi
 
-          # Upload database files with resolved symlinks
-          rm -f public/odevsa.db public/odevsa.files
-          cp public/odevsa.db.tar.gz public/odevsa.db
-          cp public/odevsa.files.tar.gz public/odevsa.files
-          echo ">> Uploading database files to release..."
-          gh release upload packages public/odevsa.db.tar.gz public/odevsa.db public/odevsa.files.tar.gz public/odevsa.files --clobber
-
-          # Fetch already uploaded assets to manage release contents
+          # 2. Fetch list of assets currently hosted on the GitHub Release
           EXISTING_ASSETS=$(gh release view packages --json assets -q '.assets[].name' 2>/dev/null || true)
+          FORCE_REBUILD="${{ inputs.force_rebuild_all }}"
+          IGNORED_PKGS=$(cat packages/.ignore 2>/dev/null || true)
 
-          # Delete obsolete and ignored assets from GitHub Release (assets no longer in public/)
-          for asset in $EXISTING_ASSETS; do
-            case "$asset" in
-              *.pkg.tar.zst)
-                if [ ! -f "public/$asset" ]; then
-                  echo ">> Deleting obsolete asset '$asset' from GitHub Release..."
-                  gh release delete-asset packages "$asset" -y || true
-                fi
-                ;;
-            esac
-          done
+          # 3. Download current repository database from release (only ~50 KB)
+          DB_EXISTS=false
+          if echo "$EXISTING_ASSETS" | grep -qx "odevsa.db.tar.gz" && [ "$FORCE_REBUILD" != "true" ]; then
+            echo ">> Downloading current repository database (~50 KB)..."
+            gh release download packages -p "odevsa.db.tar.gz" -p "odevsa.files.tar.gz" --dir public 2>/dev/null || true
+            if [ -f "public/odevsa.db.tar.gz" ]; then
+              DB_EXISTS=true
+            fi
+          fi
 
-          # Upload packages not yet present in the release
-          for pkg in public/*.pkg.tar.zst; do
-            [ -f "$pkg" ] || continue
-            pkgname=$(basename "$pkg")
-            if ! echo "$EXISTING_ASSETS" | grep -qx "$pkgname"; then
-              echo ">> Uploading $pkgname to GitHub Release..."
-              gh release upload packages "$pkg" --clobber
+          # 4. Detect changed packages via Git commit diff
+          BEFORE_SHA="${{ github.event.before }}"
+          BASE_REF=""
+          if [ -n "$BEFORE_SHA" ] && [ "$BEFORE_SHA" != "0000000000000000000000000000000000000000" ] && git cat-file -e "${BEFORE_SHA}^{commit}" 2>/dev/null; then
+            BASE_REF="$BEFORE_SHA"
+          elif git cat-file -e "HEAD~1^{commit}" 2>/dev/null; then
+            BASE_REF="HEAD~1"
+          fi
+
+          CHANGED_FILES=""
+          if [ -n "$BASE_REF" ]; then
+            echo ">> Comparing changes between $BASE_REF and HEAD..."
+            CHANGED_FILES=$(git -c safe.directory="*" diff --name-only "$BASE_REF" HEAD -- packages 2>/dev/null || git diff --name-only "$BASE_REF" HEAD -- packages || true)
+          else
+            echo ">> Inspecting changes in HEAD commit..."
+            CHANGED_FILES=$(git -c safe.directory="*" diff-tree --no-commit-id --name-only -r HEAD -- packages 2>/dev/null || git diff-tree --no-commit-id --name-only -r HEAD -- packages || true)
+          fi
+
+          echo ">> Detected changed files in packages/:"
+          echo "$CHANGED_FILES"
+
+          CHANGED_PKGS=$(echo "$CHANGED_FILES" | awk -F/ '{print $2}' | sort -u | grep -v '^\.' || true)
+          PKGS_TO_BUILD=""
+
+          # Add packages modified in git diff
+          for p in $CHANGED_PKGS; do
+            if [ -d "packages/$p" ] && [ -f "packages/$p/PKGBUILD" ]; then
+              if ! echo "$IGNORED_PKGS" | grep -qw "$p"; then
+                echo ">> Package '$p' modified in commit. Marked for build."
+                PKGS_TO_BUILD="$PKGS_TO_BUILD $p"
+              fi
             fi
           done
+
+          # 5. Check all active packages against GitHub Release assets (version-based check)
+          for pkgdir in packages/*; do
+            [ -d "$pkgdir" ] || continue
+            p=$(basename "$pkgdir")
+            [ -f "packages/$p/PKGBUILD" ] || continue
+
+            if echo "$IGNORED_PKGS" | grep -qw "$p"; then
+              continue
+            fi
+
+            if echo "$PKGS_TO_BUILD" | grep -qw "$p"; then
+              continue
+            fi
+
+            PKG_VER=$(sed -n -E 's/^[[:space:]]*pkgver=([^#[:space:]]+).*/\1/p' "packages/$p/PKGBUILD" | tr -d "'\"" | head -n1)
+            PKG_REL=$(sed -n -E 's/^[[:space:]]*pkgrel=([^#[:space:]]+).*/\1/p' "packages/$p/PKGBUILD" | tr -d "'\"" | head -n1)
+
+            if [ -n "$PKG_VER" ] && [ -n "$PKG_REL" ]; then
+              if ! echo "$EXISTING_ASSETS" | grep -qE "(^|/)${p}-${PKG_VER}-${PKG_REL}"; then
+                echo ">> Package '$p' version ${PKG_VER}-${PKG_REL} not found in Release. Marked for build."
+                PKGS_TO_BUILD="$PKGS_TO_BUILD $p"
+              fi
+            fi
+          done
+
+          # 6. Purge ignored packages from database and Release
+          DATABASE_MODIFIED=false
+          for p in $IGNORED_PKGS; do
+            [ -n "$p" ] || continue
+            if [ "$DB_EXISTS" = "true" ]; then
+              if repo-remove public/odevsa.db.tar.gz "$p" 2>/dev/null; then
+                echo ">> Removed ignored package '$p' from repository database."
+                DATABASE_MODIFIED=true
+              fi
+            fi
+            for asset in $(echo "$EXISTING_ASSETS" | grep -E "^${p}-" || true); do
+              echo ">> Deleting ignored asset '$asset' from GitHub Release..."
+              gh release delete-asset packages "$asset" -y || true
+            done
+          done
+
+          # 7. Execute package builds
+          if [ "$FORCE_REBUILD" = "true" ]; then
+            echo ">> Force rebuild requested. Performing complete build of all packages..."
+            su builder -c "make build"
+            DATABASE_MODIFIED=true
+          elif [ -n "$PKGS_TO_BUILD" ]; then
+            echo ">> Packages to build:$PKGS_TO_BUILD"
+            su builder -c "make $PKGS_TO_BUILD"
+
+            # Update database with newly built package(s)
+            cd public
+            for pkg_file in *.pkg.tar.zst; do
+              [ -f "$pkg_file" ] || continue
+              echo ">> Adding $pkg_file to database..."
+              repo-add odevsa.db.tar.gz "$pkg_file"
+            done
+            cd ..
+            DATABASE_MODIFIED=true
+          else
+            echo ">> No packages need to be built."
+          fi
+
+          # 8. Upload newly built packages to GitHub Release and prune older versions
+          NEW_PACKAGES=$(find public -maxdepth 1 -name "*.pkg.tar.zst" 2>/dev/null | wc -l)
+          if [ "$NEW_PACKAGES" -gt 0 ]; then
+            for pkg in public/*.pkg.tar.zst; do
+              [ -f "$pkg" ] || continue
+              pkgname=$(basename "$pkg")
+
+              # Extract package base name to find older versions in release
+              base_name=$(echo "$pkgname" | sed -E 's/-[0-9].*//')
+
+              # Delete any older version of this package from release
+              for old_asset in $(echo "$EXISTING_ASSETS" | grep -E "^${base_name}-[0-9]" || true); do
+                if [ "$old_asset" != "$pkgname" ]; then
+                  echo ">> Deleting older version '$old_asset' from GitHub Release..."
+                  gh release delete-asset packages "$old_asset" -y || true
+                fi
+              done
+
+              # Upload the new package
+              echo ">> Uploading $pkgname to GitHub Release..."
+              gh release upload packages "$pkg" --clobber
+            done
+          fi
+
+          # 9. Upload updated database files if modified
+          if [ "$DATABASE_MODIFIED" = "true" ] && [ -f "public/odevsa.db.tar.gz" ]; then
+            rm -f public/odevsa.db public/odevsa.files
+            cp public/odevsa.db.tar.gz public/odevsa.db
+            cp public/odevsa.files.tar.gz public/odevsa.files
+            echo ">> Uploading updated database to GitHub Release..."
+            gh release upload packages public/odevsa.db.tar.gz public/odevsa.db public/odevsa.files.tar.gz public/odevsa.files --clobber
+          fi
+
+          echo ">> Done! Repository release synchronized successfully."
