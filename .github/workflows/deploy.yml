@@ -45,9 +45,9 @@ jobs:
           GH_REPO: ${{ github.repository }}
         run: |
           export GIT_DISCOVERY_ACROSS_FILESYSTEM=1
-          git config --system --add safe.directory "*" || true
-          git config --global --add safe.directory "*" || true
-          su builder -c "git config --global --add safe.directory '*'"
+          export GIT_DIR="$PWD/.git"
+          export GIT_WORK_TREE="$PWD"
+          printf "[safe]\n\tdirectory = *\n" > /etc/gitconfig
 
           mkdir -p public
           chown -R builder:builder public/
@@ -85,10 +85,10 @@ jobs:
           CHANGED_FILES=""
           if [ -n "$BASE_REF" ]; then
             echo ">> Comparing changes between $BASE_REF and HEAD..."
-            CHANGED_FILES=$(git -c safe.directory="*" diff --name-only "$BASE_REF" HEAD -- packages 2>/dev/null || git diff --name-only "$BASE_REF" HEAD -- packages || true)
+            CHANGED_FILES=$(git diff --name-only "$BASE_REF" HEAD -- packages 2>/dev/null || true)
           else
             echo ">> Inspecting changes in HEAD commit..."
-            CHANGED_FILES=$(git -c safe.directory="*" diff-tree --no-commit-id --name-only -r HEAD -- packages 2>/dev/null || git diff-tree --no-commit-id --name-only -r HEAD -- packages || true)
+            CHANGED_FILES=$(git diff-tree --no-commit-id --name-only -r HEAD -- packages 2>/dev/null || true)
           fi
 
           echo ">> Detected changed files in packages/:"
