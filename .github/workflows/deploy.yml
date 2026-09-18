@@ -45,7 +45,6 @@ jobs:
           GH_REPO: ${{ github.repository }}
         run: |
           export GIT_DISCOVERY_ACROSS_FILESYSTEM=1
-          cd "$GITHUB_WORKSPACE"
           git config --system --add safe.directory "*" || true
           git config --global --add safe.directory "*" || true
           su builder -c "git config --global --add safe.directory '*'"
@@ -160,8 +159,9 @@ jobs:
           for p in $IGNORED_PKGS; do
             [ -n "$p" ] || continue
             if [ "$DB_EXISTS" = "true" ]; then
-              if repo-remove public/odevsa.db.tar.gz "$p" 2>/dev/null; then
-                echo ">> Removed ignored package '$p' from repository database."
+              if tar -tzf public/odevsa.db.tar.gz 2>/dev/null | grep -q "^${p}-"; then
+                echo ">> Removing ignored package '$p' from repository database..."
+                repo-remove public/odevsa.db.tar.gz "$p" >/dev/null 2>&1 || true
                 DATABASE_MODIFIED=true
               fi
             fi
