@@ -44,8 +44,9 @@ update_version() {
       HASH=""
       if printf '%s' "$EXPANDED" | grep -qE '^https?://'; then
         TMPFILE=$(mktemp)
-        curl -sSL -o "$TMPFILE" -- "$EXPANDED"
-        HASH=$(sha256sum "$TMPFILE" | cut -d' ' -f1 || true)
+        if curl -sSfL -o "$TMPFILE" -- "$EXPANDED"; then
+          HASH=$(sha256sum "$TMPFILE" | cut -d' ' -f1 || true)
+        fi
         rm -f "$TMPFILE"
       else
         LOCAL_PATH="$DIRECTORY/sources/$EXPANDED"

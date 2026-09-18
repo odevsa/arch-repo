@@ -24,7 +24,7 @@ database:
 	cd $(OUTPUT_DIR) && rm -f $(REPO_NAME).db* $(REPO_NAME).files* && repo-add $(REPO_NAME).db.tar.gz *.pkg.tar.zst
 
 update:
-	@for pkg in $(PACKAGES); do \
+	@for pkg in $(filter-out $(IGNORED_PACKAGES),$(PACKAGES)); do \
 		if [ -f $(PACKAGES_DIR)/$$pkg/update ]; then \
 			bash $(PACKAGES_DIR)/$$pkg/update; \
 		fi; \

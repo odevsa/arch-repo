@@ -121,10 +121,12 @@ jobs:
 
             PKG_VER=$(sed -n -E 's/^[[:space:]]*pkgver=([^#[:space:]]+).*/\1/p' "packages/$p/PKGBUILD" | tr -d "'\"" | head -n1)
             PKG_REL=$(sed -n -E 's/^[[:space:]]*pkgrel=([^#[:space:]]+).*/\1/p' "packages/$p/PKGBUILD" | tr -d "'\"" | head -n1)
+            PKG_NAME=$(sed -n -E 's/^[[:space:]]*pkgname=\(?([^)#[:space:]]+).*/\1/p' "packages/$p/PKGBUILD" | tr -d "'\"" | head -n1)
+            [ -n "$PKG_NAME" ] || PKG_NAME="$p"
 
             if [ -n "$PKG_VER" ] && [ -n "$PKG_REL" ]; then
-              if ! echo "$EXISTING_ASSETS" | grep -qE "(^|/)${p}-${PKG_VER}-${PKG_REL}"; then
-                echo ">> Package '$p' version ${PKG_VER}-${PKG_REL} not found in Release. Marked for build."
+              if ! echo "$EXISTING_ASSETS" | grep -qE "(^|/)(${p}|${PKG_NAME})-${PKG_VER}-${PKG_REL}"; then
+                echo ">> Package '$p' (${PKG_NAME}-${PKG_VER}-${PKG_REL}) not found in Release. Marked for build."
                 PKGS_TO_BUILD="$PKGS_TO_BUILD $p"
               fi
             fi
