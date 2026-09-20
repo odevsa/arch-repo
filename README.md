@@ -1,6 +1,6 @@
 <div align="center">
 
-[![Arch Linux](assets/arch-linux.webp)](https://archlinux.org/){:target="\_blank"}
+[![Arch Linux](assets/arch-linux.webp)](https://archlinux.org)
 
 ### **Arch Linux Packages**
 
