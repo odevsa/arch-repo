@@ -26,5 +26,8 @@ model/3mf=mesh.desktop;
 model/obj=mesh.desktop;
 model/gltf+json=mesh.desktop;
 model/gltf-binary=mesh.desktop;
+model/fbx=mesh.desktop;
+application/x-fbx=mesh.desktop;
+model/vnd.fbx=mesh.desktop;
 EOF
 }
