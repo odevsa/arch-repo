@@ -1,0 +1,30 @@
+pkgname=sd-cpp
+pkgver=920
+pkgrel=1
+pkgbuild=2f88688
+pkgdesc="Stable Diffusion C/C++ - Inference of Stable Diffusion and Flux in pure C/C++ (Vulkan enabled)"
+arch=('x86_64')
+url="https://github.com/leejet/stable-diffusion.cpp"
+license=('MIT')
+depends=('glibc' 'gcc-libs' 'vulkan-icd-loader')
+optdepends=('vulkan-driver: Vulkan acceleration support')
+provides=("${pkgname}" "sd-cli" "sd-server")
+conflicts=("${pkgname}")
+options=(!strip !debug)
+
+source=("${pkgname}-${pkgver}.zip::https://github.com/leejet/stable-diffusion.cpp/releases/download/master-${pkgver}-${pkgbuild}/sd-master-${pkgbuild}-bin-Linux-Ubuntu-24.04-x86_64-vulkan.zip")
+sha256sums=('81187de7eef5828816858de076c6d7efe4ee29e1536d22f86338960d5119c574')
+
+package() {
+  install -d "${pkgdir}/usr/lib/${pkgname}"
+  install -d "${pkgdir}/usr/bin"
+
+  install -m755 sd-cli "${pkgdir}/usr/lib/${pkgname}/sd-cli"
+  install -m755 sd-server "${pkgdir}/usr/lib/${pkgname}/sd-server"
+
+  cp -a *.so* "${pkgdir}/usr/lib/${pkgname}/"
+
+  ln -s "/usr/lib/${pkgname}/sd-cli" "${pkgdir}/usr/bin/sd-cli"
+  ln -s "/usr/lib/${pkgname}/sd-server" "${pkgdir}/usr/bin/sd-server"
+  ln -s "/usr/lib/${pkgname}/sd-cli" "${pkgdir}/usr/bin/sd-cpp"
+}

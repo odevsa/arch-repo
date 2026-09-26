@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+set -euo pipefail
+source "packages/helpers"
+
+# Get latest release tag from GitHub API
+URL="https://api.github.com/repos/leejet/stable-diffusion.cpp/releases/latest"
+RESPONSE=$(curl -sSL "${URL}")
+TAG_NAME=$(printf '%s' "$RESPONSE" | sed -n 's/.*"tag_name"[[:space:]]*:[[:space:]]*"\([^\"]*\)".*/\1/p')
+
+# Extract version number (e.g. 920) and build/commit hash (e.g. 2f88688)
+LATEST_VERSION=$(echo "$TAG_NAME" | cut -d'-' -f2)
+LATEST_BUILD=$(echo "$TAG_NAME" | cut -d'-' -f3)
+
+update_version "$LATEST_VERSION" "$LATEST_BUILD"
