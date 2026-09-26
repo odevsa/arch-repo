@@ -1,5 +1,5 @@
 pkgname=google-chrome
-pkgver=153.0.8010.52
+pkgver=154.0.8037.57
 pkgrel=1
 pkgdesc="Google Chrome - The popular web browser from Google"
 arch=('x86_64')
@@ -17,7 +17,7 @@ conflicts=("${pkgname}")
 options=('!emptydirs' '!strip')
 
 source=("google-chrome-${pkgver}.deb::https://dl.google.com/linux/chrome/deb/pool/main/g/google-chrome-stable/google-chrome-stable_${pkgver}-1_amd64.deb" "${pkgname}.sh")
-sha256sums=('29e0e4b5af01213915ffdb7f4e49a11956dc5fc591165c85af8688dcdff907ac' '3e0cd9c083e8efdd5e276538eda40857ea0da168cd6793f1f5a69e4cda569aba')
+sha256sums=('66c0645f6a19871bab2844b8537c11a0db2e7d3bea8ef85a1c7cb52a54e65a3e' '3e0cd9c083e8efdd5e276538eda40857ea0da168cd6793f1f5a69e4cda569aba')
 
 package() {
 	bsdtar -xf data.tar.xz -C "$pkgdir/"
