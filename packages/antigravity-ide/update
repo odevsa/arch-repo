@@ -3,7 +3,22 @@ set -euo pipefail
 source "packages/helpers"
 
 # Get latest version
-LATEST_VERSION=2.1.1
-LATEST_BUILD=6123990880747520
+URL="https://antigravity.google/download"
+RESPONSE=$(curl -sSL --compressed "${URL}" || true)
+URL_MATCH=$(printf '%s' "$RESPONSE" | grep -oE 'release2/j0qc3/antigravity/stable/[0-9]+\.[0-9]+\.[0-9]+-[0-9]+/linux-x64/Antigravity%20IDE\.tar\.gz' | head -n1 || true)
+
+LATEST_VERSION=""
+LATEST_BUILD=""
+
+if [ -n "$URL_MATCH" ]; then
+  VERSION_BUILD=$(echo "$URL_MATCH" | sed -E 's|.*stable/([^/]+)/linux-x64.*|\1|')
+  LATEST_VERSION=$(echo "$VERSION_BUILD" | cut -d'-' -f1)
+  LATEST_BUILD=$(echo "$VERSION_BUILD" | cut -d'-' -f2)
+fi
+
+if [ -z "$LATEST_VERSION" ]; then
+  CHANGELOG_RESP=$(curl -sSL --compressed "https://antigravity.google/docs/changelog" || true)
+  LATEST_VERSION=$(printf '%s' "$CHANGELOG_RESP" | grep -oE 'id="rel-ide-[0-9\.]+"' | head -n1 | sed -E 's/id="rel-ide-([^"]+)"/\1/' || true)
+fi
 
 update_version "$LATEST_VERSION" "$LATEST_BUILD"
