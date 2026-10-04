@@ -13,5 +13,5 @@ source=("${pkgname}-${pkgver}.deb::https://github.com/odevsa/monolai/releases/do
 sha256sums=('36dcaac66e388ea30535e198fd738d0b0bc2549d13442504bb3969a13bdc95d0')
 
 package() {
-    bsdtar -xf data.tar.zst -C "${pkgdir}/"
+    bsdtar -xf data.tar.xz -C "${pkgdir}/"
 }
