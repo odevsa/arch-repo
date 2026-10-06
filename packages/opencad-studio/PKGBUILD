@@ -1,5 +1,5 @@
 pkgname=opencad-studio
-pkgver=2026.40
+pkgver=2026.40.1
 pkgrel=1
 pkgdesc="OpenCADStudio - 2D/3D CAD application for DWG and DXF drawings"
 arch=('x86_64')
@@ -16,7 +16,7 @@ options=(!strip !debug)
 
 appimage="${pkgname}-${pkgver}.AppImage"
 source=("${appimage}::https://github.com/HakanSeven12/OpenCADStudio/releases/download/v${pkgver}/OpenCADStudio-v${pkgver}-linux-x86_64.AppImage")
-sha256sums=('7d8bf777519a9cee2b3d2ec61cf16d9cbb75efd03b78565d006bf1038bad91d5')
+sha256sums=('4b8f5d2dfee932bd557308d1b4c66ca8d23f0f4ffe37c8c1ab77980c45c84f98')
 
 prepare() {
   chmod +x "${appimage}"
