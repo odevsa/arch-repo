@@ -1,0 +1,23 @@
+pkgname=pi
+pkgver=1.1.0
+pkgrel=1
+pkgdesc="AI agent toolkit: unified LLM API, agent loop, TUI, coding agent CLI"
+arch=('x86_64')
+url="https://github.com/earendil-works/pi"
+license=('MIT')
+provides=("${pkgname}")
+conflicts=("${pkgname}")
+options=(!strip !debug)
+
+source=("${pkgname}-${pkgver}.tar.gz::https://github.com/earendil-works/pi/releases/download/v${pkgver}/pi-linux-x64.tar.gz")
+sha256sums=('3faa94666cd3849d37af320ff749407d0271b07a9b94f420c87e30866e10e289')
+
+package() {
+  install -d "${pkgdir}/usr/lib/${pkgname}"
+  install -d "${pkgdir}/usr/bin"
+
+  cp -dr --no-preserve=ownership "${srcdir}/${pkgname}/." "${pkgdir}/usr/lib/${pkgname}/"
+  chmod 755 "${pkgdir}/usr/lib/${pkgname}/${pkgname}"
+
+  ln -s "/usr/lib/${pkgname}/${pkgname}" "${pkgdir}/usr/bin/${pkgname}"
+}
