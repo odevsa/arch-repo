@@ -1,0 +1,17 @@
+pkgname=vectorcraft
+pkgver=0.8.0
+pkgrel=1
+pkgdesc="VectorCraft - Open-source, native vector illustration app"
+arch=('x86_64')
+url="https://github.com/storytold/vectorcraft"
+license=('Apache-2.0')
+provides=("${pkgname}")
+conflicts=("${pkgname}")
+options=(!strip !debug)
+
+source=("${pkgname}-${pkgver}.deb::https://github.com/storytold/vectorcraft/releases/download/v${pkgver}/${pkgname}-${pkgver}-linux-x86_64.deb")
+sha256sums=('2d1804ebf70fab839efff1d2d0b7ef3caaa26f0ec8db47ae87171efc78e5e783')
+
+package() {
+    bsdtar -xf data.tar.* -C "${pkgdir}/"
+}
