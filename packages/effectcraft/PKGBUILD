@@ -1,0 +1,17 @@
+pkgname=effectcraft
+pkgver=0.7.0
+pkgrel=1
+pkgdesc="EffectCraft - Open-source motion graphics and visual effects compositor"
+arch=('x86_64')
+url="https://github.com/storytold/effectcraft"
+license=('Apache-2.0')
+provides=("${pkgname}")
+conflicts=("${pkgname}")
+options=(!strip !debug)
+
+source=("${pkgname}-${pkgver}.deb::https://github.com/storytold/effectcraft/releases/download/v${pkgver}/${pkgname}-${pkgver}-linux-x86_64.deb")
+sha256sums=('19622c751046df21cbecdcdc2596257a1795d04d394b165009e169f96a13a4e2')
+
+package() {
+    bsdtar -xf data.tar.* -C "${pkgdir}/"
+}

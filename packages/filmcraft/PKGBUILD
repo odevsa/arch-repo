@@ -1,0 +1,17 @@
+pkgname=filmcraft
+pkgver=0.5.0
+pkgrel=1
+pkgdesc="FilmCraft - Open-source, clean-room reimplementation of Adobe Premiere Pro"
+arch=('x86_64')
+url="https://github.com/storytold/filmcraft"
+license=('Apache-2.0')
+provides=("${pkgname}")
+conflicts=("${pkgname}")
+options=(!strip !debug)
+
+source=("${pkgname}-${pkgver}.deb::https://github.com/storytold/filmcraft/releases/download/v${pkgver}/${pkgname}-${pkgver}-linux-x86_64.deb")
+sha256sums=('e1a167ec19a2dcd40bbf181ee510e15acfc73282e35a0b173bd6d6fd48c420f5')
+
+package() {
+    bsdtar -xf data.tar.* -C "${pkgdir}/"
+}

@@ -1,0 +1,17 @@
+pkgname=designcraft
+pkgver=0.5.0
+pkgrel=1
+pkgdesc="DesignCraft - Open-source, native page layout and publishing app"
+arch=('x86_64')
+url="https://github.com/storytold/designcraft"
+license=('Apache-2.0')
+provides=("${pkgname}")
+conflicts=("${pkgname}")
+options=(!strip !debug)
+
+source=("${pkgname}-${pkgver}.deb::https://github.com/storytold/designcraft/releases/download/v${pkgver}/${pkgname}-${pkgver}-linux-x86_64.deb")
+sha256sums=('94719bd01ea59d932f9aea8c167065b484e7e51e6c97dc6aa04f661063e721a6')
+
+package() {
+    bsdtar -xf data.tar.* -C "${pkgdir}/"
+}

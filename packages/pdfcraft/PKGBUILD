@@ -1,0 +1,17 @@
+pkgname=pdfcraft
+pkgver=0.5.0
+pkgrel=1
+pkgdesc="PdfCraft - Open-source, clean-room reimplementation of Adobe Acrobat"
+arch=('x86_64')
+url="https://github.com/storytold/pdfcraft"
+license=('Apache-2.0')
+provides=("${pkgname}")
+conflicts=("${pkgname}")
+options=(!strip !debug)
+
+source=("${pkgname}-${pkgver}.deb::https://github.com/storytold/pdfcraft/releases/download/v${pkgver}/${pkgname}-${pkgver}-linux-x86_64.deb")
+sha256sums=('7b840784b6aaae474a4cae506f63bb392049b359e7de3a4c758f98402b095b5f')
+
+package() {
+    bsdtar -xf data.tar.* -C "${pkgdir}/"
+}
