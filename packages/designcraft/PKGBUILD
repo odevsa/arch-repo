@@ -1,5 +1,5 @@
 pkgname=designcraft
-pkgver=0.5.0
+pkgver=0.6.0
 pkgrel=1
 pkgdesc="DesignCraft - Open-source, native page layout and publishing app"
 arch=('x86_64')
@@ -10,7 +10,7 @@ conflicts=("${pkgname}")
 options=(!strip !debug)
 
 source=("${pkgname}-${pkgver}.deb::https://github.com/storytold/designcraft/releases/download/v${pkgver}/${pkgname}-${pkgver}-linux-x86_64.deb")
-sha256sums=('94719bd01ea59d932f9aea8c167065b484e7e51e6c97dc6aa04f661063e721a6')
+sha256sums=('fcd82ec80a0665b13ddfd8e263b2a1eef5881c5bc2c63b34a7009f9c4ebdefeb')
 
 package() {
     bsdtar -xf data.tar.* -C "${pkgdir}/"
