@@ -1,0 +1,17 @@
+pkgname=gridcraft
+pkgver=0.6.1
+pkgrel=1
+pkgdesc="GridCraft - Open-source, clean-room spreadsheet app (Microsoft Excel-style)"
+arch=('x86_64')
+url="https://github.com/storytold/gridcraft"
+license=('Apache-2.0')
+provides=("${pkgname}")
+conflicts=("${pkgname}")
+options=(!strip !debug)
+
+source=("${pkgname}-${pkgver}.deb::https://github.com/storytold/gridcraft/releases/download/v${pkgver}/${pkgname}-${pkgver}-linux-x86_64.deb")
+sha256sums=('002e695c88a676d1f4a156433b6a842a08705047a3b7f74ef553048d44f43620')
+
+package() {
+    bsdtar -xf data.tar.* -C "${pkgdir}/"
+}
