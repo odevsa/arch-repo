@@ -1,5 +1,5 @@
 pkgname=figcraft
-pkgver=0.5.1
+pkgver=0.6.0
 pkgrel=1
 pkgdesc="FigCraft - Open-source interface design and prototyping app"
 arch=('x86_64')
@@ -10,7 +10,7 @@ conflicts=("${pkgname}")
 options=(!strip !debug)
 
 source=("${pkgname}-${pkgver}.deb::https://github.com/storytold/figcraft/releases/download/v${pkgver}/${pkgname}-${pkgver}-linux-x86_64.deb")
-sha256sums=('2dd0b7c6d8ddda3e2c52124f93f61dab8755b3b1777041210d1763bf0ea474e8')
+sha256sums=('34eb89556bbac1fa2b5ed6fccc5342257dd3bb013ce91ea8a019f38e03fec050')
 
 package() {
     bsdtar -xf data.tar.* -C "${pkgdir}/"

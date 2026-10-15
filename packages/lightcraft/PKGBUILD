@@ -1,5 +1,5 @@
 pkgname=lightcraft
-pkgver=0.7.1
+pkgver=0.8.0
 pkgrel=1
 pkgdesc="LightCraft - Open-source, clean-room reimplementation of Adobe Lightroom"
 arch=('x86_64')
@@ -10,7 +10,7 @@ conflicts=("${pkgname}")
 options=(!strip !debug)
 
 source=("${pkgname}-${pkgver}.deb::https://github.com/storytold/lightcraft/releases/download/v${pkgver}/${pkgname}-${pkgver}-linux-x86_64.deb")
-sha256sums=('b00b8ace27222ef4eb566aa276100e81e9241ee81e78b6ccb133d0edf8fa863e')
+sha256sums=('393e8b426138ae86d8f8f6d22d5b2085463f550b1b63e772ca0a2e6b809fe477')
 
 package() {
     bsdtar -xf data.tar.* -C "${pkgdir}/"
