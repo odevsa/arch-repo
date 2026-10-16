@@ -1,7 +1,7 @@
 pkgname=sd-cpp
-pkgver=964
+pkgver=968
 pkgrel=1
-pkgbuild=1d0a58a
+pkgbuild=8cd731e
 pkgdesc="Stable Diffusion C/C++ - Inference of Stable Diffusion and Flux in pure C/C++ (Vulkan enabled)"
 arch=('x86_64')
 url="https://github.com/leejet/stable-diffusion.cpp"
@@ -13,7 +13,7 @@ conflicts=("${pkgname}")
 options=(!strip !debug)
 
 source=("${pkgname}-${pkgver}.zip::https://github.com/leejet/stable-diffusion.cpp/releases/download/master-${pkgver}-${pkgbuild}/sd-master-${pkgbuild}-bin-Linux-Ubuntu-24.04-x86_64-vulkan.zip")
-sha256sums=('bade142929edfa7aad56aba46376e55142d14390262b904f4a2deb3a03ceb21d')
+sha256sums=('1e82f932a678e28035d64bc9909b9c122c6ec0f92fcfd8e9ac2bea99b5619505')
 
 package() {
   install -d "${pkgdir}/usr/lib/${pkgname}"
