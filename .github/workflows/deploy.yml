@@ -30,7 +30,7 @@ jobs:
 
       - name: Initialize Arch environment
         run: |
-          pacman -Syu --noconfirm --needed base-devel git pacman-contrib github-cli
+          pacman -Syu --noconfirm --needed base-devel git pacman-contrib github-cli just
 
       - name: Configure non-root user (makepkg does not run as root)
         run: |
