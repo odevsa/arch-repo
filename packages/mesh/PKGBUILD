@@ -11,7 +11,7 @@ conflicts=("${pkgname}")
 options=(!strip !debug)
 
 source=("${pkgname}-${pkgver}.deb::https://github.com/odevsa/mesh/releases/download/v${pkgver}/${pkgname}-${pkgver}-linux-x86_64.deb")
-sha256sums=('efc0a247130b2c448dbf2b0cb57ee1265f838d8cad9ba9e280545b247cadfb9d')
+sha256sums=('0adc5fcad297642d616363425ce2a0654c40f701539cb9dd2cf075c964b2fe6d')
 
 package() {
   bsdtar -xf data.tar.xz -C "${pkgdir}/"
