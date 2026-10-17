@@ -17,17 +17,17 @@
 
 This repository contains packaging metadata and binaries for Arch Linux packages used in this project. The `packages/` directory contains package files and PKGBUILD scripts. A top-level `Makefile` provides convenient targets for building and managing the repository.
 
-### Makefile
+### Tasks (Just & Makefile)
 
-See the `Makefile` at the repository root for available targets. Typical usage:
+The canonical tasks are defined in `justfile` ([just](https://github.com/casey/just)). A `Makefile` wrapper is also provided for convenience:
 
-- `make build`: Build all packages and update repo database
-- `make <packages>`: Build a specific packages
-- `make update`: Update all packages versions
-- `make clean`: Remove built packages and output directories
-- `make help`: Show this help message
-
-Check the `Makefile` to see the exact target names and behaviors.
+- `make build` / `just build`: Build all packages and update repo database
+- `make build <package>` / `just build <package>`: Build a specific package
+- `make install <package>` / `just install <package>`: Update, build, and install a package locally
+- `make update` / `just update`: Update all package versions
+- `make update <package>` / `just update <package>`: Update a specific package version
+- `make clean` / `just clean`: Remove built packages and output directories
+- `make help` / `just help`: Show available tasks
 
 ### Adding this repo to /etc/pacman.conf
 
