@@ -92,7 +92,7 @@ update package="":
             exit 1
         fi
         if [ -f "{{packages_dir}}/$TARGET/update" ]; then
-            echo "==> Updating $TARGET..."
+            echo "==> Verifying $TARGET..."
             bash "{{packages_dir}}/$TARGET/update"
         else
             echo "==> No update script found for $TARGET ({{packages_dir}}/$TARGET/update)."
@@ -116,7 +116,7 @@ update package="":
                 continue
             fi
             if [ -f "$pkgdir/update" ]; then
-                echo "==> Updating $pkg..."
+                echo "==> Verifying $pkg..."
                 bash "$pkgdir/update"
             fi
         done
