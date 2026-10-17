@@ -19,7 +19,7 @@ jobs:
           token: ${{ secrets.PAT_TOKEN }}
 
       - name: Setup just
-        uses: extra-actions/setup-just@v2
+        uses: extractions/setup-just@v2
 
       - name: Run update
         run: make update
