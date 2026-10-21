@@ -1,5 +1,5 @@
 pkgname=effectcraft
-pkgver=0.13.0
+pkgver=0.14.0
 pkgrel=1
 pkgdesc="EffectCraft - Open-source motion graphics and visual effects compositor"
 arch=('x86_64')
@@ -10,7 +10,7 @@ conflicts=("${pkgname}")
 options=(!strip !debug)
 
 source=("${pkgname}-${pkgver}.deb::https://github.com/storytold/effectcraft/releases/download/v${pkgver}/${pkgname}-${pkgver}-linux-x86_64.deb")
-sha256sums=('2f6df12ab92d84d815869cd7581b699dfdc8ccc859a27cccbc14dbfa6541397a')
+sha256sums=('2ca284b77910ec66ecd1adf0ecc32ea83436f93719162dc0b566ad8765c6688c')
 
 package() {
     bsdtar -xf data.tar.* -C "${pkgdir}/"
