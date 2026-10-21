@@ -1,5 +1,5 @@
 pkgname=gridcraft
-pkgver=0.8.0
+pkgver=0.9.0
 pkgrel=1
 pkgdesc="GridCraft - Open-source, clean-room spreadsheet app (Microsoft Excel-style)"
 arch=('x86_64')
@@ -10,7 +10,7 @@ conflicts=("${pkgname}")
 options=(!strip !debug)
 
 source=("${pkgname}-${pkgver}.deb::https://github.com/storytold/gridcraft/releases/download/v${pkgver}/${pkgname}-${pkgver}-linux-x86_64.deb")
-sha256sums=('1bb558df8890821e061e999af69d2ba9b321c07d32901ab6819a4b428ad9a47d')
+sha256sums=('74c72ba39b0b52087dcd99b59a391d3bf5b2ba3a21bb6229312c41c668bd9111')
 
 package() {
     bsdtar -xf data.tar.* -C "${pkgdir}/"

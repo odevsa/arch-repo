@@ -1,5 +1,5 @@
 pkgname=wordcraft
-pkgver=0.8.0
+pkgver=0.9.0
 pkgrel=1
 pkgdesc="WordCraft - Open-source, clean-room reimplementation of Microsoft Word"
 arch=('x86_64')
@@ -10,7 +10,7 @@ conflicts=("${pkgname}")
 options=(!strip !debug)
 
 source=("${pkgname}-${pkgver}.deb::https://github.com/storytold/wordcraft/releases/download/v${pkgver}/${pkgname}-${pkgver}-linux-x86_64.deb")
-sha256sums=('300ced2e0ee01a2bad3302c6c7efb5086d5adce71a7cf68195f61c3649b46bff')
+sha256sums=('859a52485df8ac63bfc8e75db6345001c176a9c2f937003b95166697c492558a')
 
 package() {
     bsdtar -xf data.tar.* -C "${pkgdir}/"
