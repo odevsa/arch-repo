@@ -1,5 +1,5 @@
 pkgname=cadcraft
-pkgver=0.10.0
+pkgver=0.12.0
 pkgrel=1
 pkgdesc="CADCraft - Open-source, clean-room AutoCAD-style drafting app"
 arch=('x86_64')
@@ -10,7 +10,7 @@ conflicts=("${pkgname}")
 options=(!strip !debug)
 
 source=("${pkgname}-${pkgver}.deb::https://github.com/storytold/cadcraft/releases/download/v${pkgver}/${pkgname}-${pkgver}-linux-x86_64.deb")
-sha256sums=('afba66d6c7572e7e8a8146ebc12f9584c0ba6cb8f00d5169e20b0ba775324399')
+sha256sums=('239ddb98a0fd4fa97e62c53de93a5aa286b93d88c328776a4d09b539390c92dd')
 
 package() {
     bsdtar -xf data.tar.* -C "${pkgdir}/"

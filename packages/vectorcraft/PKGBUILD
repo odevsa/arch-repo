@@ -1,5 +1,5 @@
 pkgname=vectorcraft
-pkgver=0.14.0
+pkgver=0.16.0
 pkgrel=1
 pkgdesc="VectorCraft - Open-source, native vector illustration app"
 arch=('x86_64')
@@ -10,7 +10,7 @@ conflicts=("${pkgname}")
 options=(!strip !debug)
 
 source=("${pkgname}-${pkgver}.deb::https://github.com/storytold/vectorcraft/releases/download/v${pkgver}/${pkgname}-${pkgver}-linux-x86_64.deb")
-sha256sums=('bc0a8305d84709913217e559eaa865c938c9269849fe6d5f1dd25b080c17f0a3')
+sha256sums=('c9dbd6c82f28247a005846f1123144161148895cd7b5ccd21ae419de3f2631ac')
 
 package() {
     bsdtar -xf data.tar.* -C "${pkgdir}/"
