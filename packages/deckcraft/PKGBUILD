@@ -1,5 +1,5 @@
 pkgname=deckcraft
-pkgver=0.10.0
+pkgver=0.11.1
 pkgrel=1
 pkgdesc="DeckCraft - Open-source, clean-room reimplementation of Microsoft PowerPoint"
 arch=('x86_64')
@@ -10,7 +10,7 @@ conflicts=("${pkgname}")
 options=(!strip !debug)
 
 source=("${pkgname}-${pkgver}.deb::https://github.com/storytold/deckcraft/releases/download/v${pkgver}/${pkgname}-${pkgver}-linux-x86_64.deb")
-sha256sums=('e899616ded007a5f2a4cc535469a1339df4217e3e4df87d181c8e4283771ed08')
+sha256sums=('2f638903ff8bdde9ddb878389812dbb9a02f74892215b599e8b97ce44cbd829f')
 
 package() {
     bsdtar -xf data.tar.* -C "${pkgdir}/"
