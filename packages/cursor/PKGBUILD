@@ -1,0 +1,49 @@
+pkgname=cursor
+pkgver=3.27.22
+pkgrel=1
+pkgdesc="Cursor - The AI Code Editor"
+arch=('x86_64')
+url="https://cursor.com/"
+license=('custom:commercial')
+depends=('alsa-lib' 'at-spi2-core' 'cairo' 'curl' 'dbus' 'expat' 'gcc-libs' 'glib2' 'glibc' 'gnupg' 'gtk3' 'libcups' 'libnotify' 'libsecret' 'libx11' 'libxcb' 'libxcomposite' 'libxdamage' 'libxext' 'libxfixes' 'libxkbcommon' 'libxkbfile' 'libxrandr' 'libxss' 'lsof' 'mesa' 'nspr' 'nss' 'pango' 'shared-mime-info' 'xdg-utils')
+optdepends=('vulkan-icd-loader: For Vulkan support'
+            'libdbusmenu-glib: Needed for KDE global menu'
+            'org.freedesktop.secrets: Needed for credential storage and settings sync')
+provides=('cursor' 'cursor-bin')
+conflicts=('cursor-bin')
+options=(!strip !debug)
+
+source=("${pkgname}-${pkgver}.deb::https://downloads.cursor.com/aptrepo/pool/stable/c/cu/cursor_${pkgver}_amd64.deb" "${pkgname}.sh")
+sha256sums=('863a9dd15ca5fe84dd2f8e74fe2e926e8b438692f202277a89dd0ec3d928bf98' 'b00091384269076d063fabaeeec15e7f331fe5f5e7070f431dd4cea35c85dce6')
+
+package() {
+  bsdtar -xf data.tar.xz -C "${pkgdir}/"
+
+  install -d "${pkgdir}/usr/bin"
+  install -d "${pkgdir}/usr/share/licenses/${pkgname}"
+
+  ln -s /usr/share/cursor/resources/app/LICENSE.txt \
+    "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
+  ln -s /usr/share/cursor/LICENSES.chromium.html \
+    "${pkgdir}/usr/share/licenses/${pkgname}/LICENSES.chromium.html"
+
+  install -m755 "${srcdir}/${pkgname}.sh" "${pkgdir}/usr/bin/cursor"
+  ln -s /usr/share/cursor/bin/cursor-tunnel "${pkgdir}/usr/bin/cursor-tunnel"
+
+  # Move zsh completions to Arch site-functions directory
+  if [ -d "${pkgdir}/usr/share/zsh/vendor-completions" ]; then
+    install -d "${pkgdir}/usr/share/zsh/site-functions"
+    mv "${pkgdir}"/usr/share/zsh/vendor-completions/* "${pkgdir}/usr/share/zsh/site-functions/"
+    rmdir "${pkgdir}/usr/share/zsh/vendor-completions"
+  fi
+
+  # Icon symlink for desktop environments looking for cursor.png
+  ln -s co.anysphere.cursor.png "${pkgdir}/usr/share/pixmaps/cursor.png"
+
+  # Ensure desktop files call the wrapper script /usr/bin/cursor
+  sed -i \
+    -e 's|/usr/share/cursor/cursor|cursor|g' \
+    "${pkgdir}"/usr/share/applications/*.desktop
+
+  chmod u-s "${pkgdir}/usr/share/cursor/chrome-sandbox"
+}

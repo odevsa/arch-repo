@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+set -euo pipefail
+source "packages/helpers"
+
+# Get latest version
+URL="https://downloads.cursor.com/aptrepo/dists/stable/main/binary-amd64/Packages"
+RESPONSE=$(curl -sSL "${URL}")
+LATEST_VERSION=$(printf '%s' "$RESPONSE" | awk '/^Package: cursor$/{p=1} p && /^Filename:/{print $2; exit}' | sed -E 's/.*cursor_([^_]+)_amd64\.deb/\1/')
+
+update_version "$LATEST_VERSION"
