@@ -1,5 +1,5 @@
 pkgname=monolai
-pkgver=0.3.1
+pkgver=0.3.2
 pkgrel=1
 pkgdesc="Monolai - A lightweight, local AI model manager and OpenAI-compatible runtime"
 arch=('x86_64')
@@ -10,7 +10,7 @@ conflicts=("${pkgname}")
 options=(!strip !debug)
 
 source=("${pkgname}-${pkgver}.deb::https://github.com/odevsa/monolai/releases/download/v${pkgver}/${pkgname}-${pkgver}-linux-x86_64.deb")
-sha256sums=('26ea0089ffe17d02340bb85e15e5a80fae2b4db347da0a04b3aa267bf54f8ffc')
+sha256sums=('0a7006783790aeefdaeeab942d47a6fdeee1e82daed25f1635881775784c33cb')
 
 package() {
     bsdtar -xf data.tar.xz -C "${pkgdir}/"
