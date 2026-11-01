@@ -10,7 +10,7 @@ conflicts=("${pkgname}")
 options=(!strip !debug)
 
 source=("${pkgname}-${pkgver}.deb::https://github.com/odevsa/monolai/releases/download/v${pkgver}/${pkgname}-${pkgver}-linux-x86_64.deb")
-sha256sums=('0a7006783790aeefdaeeab942d47a6fdeee1e82daed25f1635881775784c33cb')
+sha256sums=('b3748b3be0d3442c8588ef2af41c8811b62a2312df4475d6c8416034b26dcbe8')
 
 package() {
     bsdtar -xf data.tar.xz -C "${pkgdir}/"
