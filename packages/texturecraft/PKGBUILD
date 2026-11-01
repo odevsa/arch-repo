@@ -1,0 +1,18 @@
+pkgname=texturecraft
+pkgver=0.2.0
+pkgrel=1
+pkgdesc="TextureCraft - Open-source, 3D texture painting workflow written in Rust"
+arch=('x86_64')
+url="https://github.com/storytold/texturecraft"
+license=('Apache-2.0')
+provides=("${pkgname}")
+conflicts=("${pkgname}")
+options=(!strip !debug)
+
+source=("${pkgname}-${pkgver}.deb::https://github.com/storytold/texturecraft/releases/download/v${pkgver}/${pkgname}-${pkgver}-linux-x86_64.deb")
+sha256sums=('d1339c54bde5bd22f42b8a07c20637d5f05db0a0195d49802421d698ca84d17e')
+
+package() {
+    bsdtar -xf data.tar.* -C "${pkgdir}/"
+}
+
