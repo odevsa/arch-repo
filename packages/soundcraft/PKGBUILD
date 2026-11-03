@@ -1,5 +1,5 @@
 pkgname=soundcraft
-pkgver=0.16.0
+pkgver=0.17.0
 pkgrel=1
 pkgdesc="SoundCraft - Open-source, clean-room reimplementation of Avid Pro Tools"
 arch=('x86_64')
@@ -10,7 +10,7 @@ conflicts=("${pkgname}")
 options=(!strip !debug)
 
 source=("${pkgname}-${pkgver}.deb::https://github.com/storytold/soundcraft/releases/download/v${pkgver}/${pkgname}-${pkgver}-linux-x86_64.deb")
-sha256sums=('ac41e447ad04a386b3acbc0ca5f79a8fd1934d1635d03e5f87af00f6043aedab')
+sha256sums=('ec9b8833b63a6396121a26c76b1b23a64fdf3fc97360c5dae77f3fde4204667a')
 
 package() {
     bsdtar -xf data.tar.* -C "${pkgdir}/"
