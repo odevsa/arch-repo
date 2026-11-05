@@ -1,0 +1,18 @@
+pkgname=materialcraft
+pkgver=0.1.2
+pkgrel=1
+pkgdesc="MaterialCraft - Procedural materials; an open-source, node-based material designer, built in pure Rust."
+arch=('x86_64')
+url="https://github.com/storytold/materialcraft"
+license=('Apache-2.0')
+provides=("${pkgname}")
+conflicts=("${pkgname}")
+options=(!strip !debug)
+
+source=("${pkgname}-${pkgver}.deb::https://github.com/storytold/materialcraft/releases/download/v${pkgver}/${pkgname}-${pkgver}-linux-x86_64.deb")
+sha256sums=('5413394519872697415a9769dbe8a6d92183bb19ab184b685d4ad58d54189178')
+
+package() {
+    bsdtar -xf data.tar.* -C "${pkgdir}/"
+}
+
