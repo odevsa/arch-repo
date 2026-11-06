@@ -1,0 +1,19 @@
+pkgname=concat
+pkgver=0.2.9
+pkgrel=1
+pkgdesc="Concat - Free, open-source, local-first video editor"
+arch=('x86_64')
+url="https://github.com/jub0t/Concat"
+license=('AGPL-3.0-or-later')
+depends=('alsa-lib' 'fontconfig' 'freetype2' 'glibc' 'gtk3' 'libxkbcommon' 'mesa')
+provides=("${pkgname}")
+conflicts=("${pkgname}")
+options=(!strip !debug)
+
+source=("${pkgname}-${pkgver}.deb::https://github.com/jub0t/Concat/releases/download/v${pkgver}/Concat-${pkgver}-linux-x86_64.deb")
+sha256sums=('565858131c8af465a56cdb0ea8379947158165ed9553356b92a6c613b8844df0')
+
+package() {
+    bsdtar -xf data.tar.* -C "${pkgdir}/"
+}
+
