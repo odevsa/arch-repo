@@ -1,5 +1,5 @@
 pkgname=craft-anything
-pkgver=0.3.0
+pkgver=0.4.0
 pkgrel=1
 pkgdesc="Craft Anything - Open-source engine to inspect software and craft your own"
 arch=('x86_64')
@@ -10,7 +10,7 @@ conflicts=("${pkgname}")
 options=(!strip !debug)
 
 source=("${pkgname}-${pkgver}.deb::https://github.com/storytold/craft-anything/releases/download/v${pkgver}/${pkgname}-${pkgver}-linux-x86_64.deb")
-sha256sums=('b0334b6105e936a9d5abb786ff4e3a8661ae0298f4d3564e09f1667bd984870d')
+sha256sums=('34add340ab445f15c75048287cf9614381cc0e9ff7324b6436dd1a69efcc1c42')
 
 package() {
     bsdtar -xf data.tar.* -C "${pkgdir}/"
