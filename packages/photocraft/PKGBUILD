@@ -1,5 +1,5 @@
 pkgname=photocraft
-pkgver=0.21.0
+pkgver=0.22.0
 pkgrel=1
 pkgdesc="PhotoCraft - Open-source, native image editor with familiar, professional tools"
 arch=('x86_64')
@@ -10,7 +10,7 @@ conflicts=("${pkgname}")
 options=(!strip !debug)
 
 source=("${pkgname}-${pkgver}.deb::https://github.com/storytold/photocraft/releases/download/v${pkgver}/${pkgname}-${pkgver}-linux-x86_64.deb")
-sha256sums=('64c3cd0621f2318ea31ddafd8d235c06731d3f2e2c39c1f206b3a7691ac4551d')
+sha256sums=('d9c272fb0f2667eb1bd35e601a5541d10f4dae93e3a9b70165d9b3dd43c280bf')
 
 package() {
     bsdtar -xf data.tar.* -C "${pkgdir}/"

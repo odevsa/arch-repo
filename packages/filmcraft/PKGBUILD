@@ -1,5 +1,5 @@
 pkgname=filmcraft
-pkgver=0.18.0
+pkgver=0.19.0
 pkgrel=1
 pkgdesc="FilmCraft - Open-source, clean-room reimplementation of Adobe Premiere Pro"
 arch=('x86_64')
@@ -10,7 +10,7 @@ conflicts=("${pkgname}")
 options=(!strip !debug)
 
 source=("${pkgname}-${pkgver}.deb::https://github.com/storytold/filmcraft/releases/download/v${pkgver}/${pkgname}-${pkgver}-linux-x86_64.deb")
-sha256sums=('b2e55260bb7c6f0e1a9f6ffc13b6e36a1f241f43eae007b85c6c08421e258ce3')
+sha256sums=('ddcc5b25c90862555fd37be517a45cbecc5bd8a3ecd1749ec2141afe9e9a9a5b')
 
 package() {
     bsdtar -xf data.tar.* -C "${pkgdir}/"
