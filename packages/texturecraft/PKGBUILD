@@ -1,5 +1,5 @@
 pkgname=texturecraft
-pkgver=0.5.0
+pkgver=0.6.1
 pkgrel=1
 pkgdesc="TextureCraft - Open-source, 3D texture painting workflow written in Rust"
 arch=('x86_64')
@@ -10,7 +10,7 @@ conflicts=("${pkgname}")
 options=(!strip !debug)
 
 source=("${pkgname}-${pkgver}.deb::https://github.com/storytold/texturecraft/releases/download/v${pkgver}/${pkgname}-${pkgver}-linux-x86_64.deb")
-sha256sums=('a9364709e78f479774669f118e732b73f51ba841193b4ffda7d5c02e141e6df6')
+sha256sums=('c1b3a4a43eb2f1e3e90b92047a3e81fc14ee85278b5e8f0352480ac4655389b9')
 
 package() {
     bsdtar -xf data.tar.* -C "${pkgdir}/"

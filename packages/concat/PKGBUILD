@@ -1,5 +1,5 @@
 pkgname=concat
-pkgver=0.2.9
+pkgver=0.2.10
 pkgrel=1
 pkgdesc="Concat - Free, open-source, local-first video editor"
 arch=('x86_64')
@@ -11,7 +11,7 @@ conflicts=("${pkgname}")
 options=(!strip !debug)
 
 source=("${pkgname}-${pkgver}.deb::https://github.com/jub0t/Concat/releases/download/v${pkgver}/Concat-${pkgver}-linux-x86_64.deb")
-sha256sums=('565858131c8af465a56cdb0ea8379947158165ed9553356b92a6c613b8844df0')
+sha256sums=('4eed6acef7fb447f9413e0ec98e6abd4e5bdd948ef73e40896f150347dd1bb1b')
 
 package() {
     bsdtar -xf data.tar.* -C "${pkgdir}/"
