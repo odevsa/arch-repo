@@ -1,5 +1,5 @@
 pkgname=pi
-pkgver=1.5.2
+pkgver=1.6.0
 pkgrel=1
 pkgdesc="AI agent toolkit: unified LLM API, agent loop, TUI, coding agent CLI"
 arch=('x86_64')
@@ -10,7 +10,7 @@ conflicts=("${pkgname}")
 options=(!strip !debug)
 
 source=("${pkgname}-${pkgver}.tar.gz::https://github.com/earendil-works/pi/releases/download/v${pkgver}/pi-linux-x64.tar.gz")
-sha256sums=('811c6f2c9e7aaee252b5404252e556fb713aa209c1f7f924226aa77d4ef70cb5')
+sha256sums=('ef77dbe4379b3bdeb425a1e1b862fa3c915c255000dfe4965c98eee96a5765d1')
 
 package() {
   install -d "${pkgdir}/usr/lib/${pkgname}"
