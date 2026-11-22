@@ -1,5 +1,5 @@
 pkgname=solidcraft
-pkgver=0.45.0
+pkgver=0.46.2
 pkgrel=1
 pkgdesc="SolidCraft - Open-source parametric 3D CAD application built in Rust"
 arch=('x86_64')
@@ -10,7 +10,7 @@ conflicts=("${pkgname}")
 options=(!strip !debug)
 
 source=("${pkgname}-${pkgver}.deb::https://github.com/bherbruck/solidcraft/releases/download/v${pkgver}/${pkgname}-${pkgver}-linux-x86_64.deb")
-sha256sums=('ba5aaa9bcd59ba56e4826e73b2c91603763b0db9fc932f48e6b962229d88db7f')
+sha256sums=('31cb4bde0a77035553806cbacf99879f4b561e450ccca7cd8545a48465742507')
 
 package() {
     bsdtar -xf data.tar.* -C "${pkgdir}/"
