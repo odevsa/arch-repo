@@ -1,0 +1,17 @@
+pkgname=tracedraw
+pkgver=0.52.0
+pkgrel=1
+pkgdesc="TraceDraw - Open-source, clean-room vector editor written from scratch in pure Rust"
+arch=('x86_64')
+url="https://github.com/tracedraw/tracedraw"
+license=('Apache-2.0' 'MIT')
+provides=("${pkgname}")
+conflicts=("${pkgname}")
+options=(!strip !debug)
+
+source=("${pkgname}-${pkgver}.deb::https://github.com/tracedraw/tracedraw/releases/download/v${pkgver}/${pkgname}_${pkgver}_amd64.deb")
+sha256sums=('5759360533309260be42b01aba7cb0a29c8391188d600555232ef8dc54f19b6f')
+
+package() {
+    bsdtar -xf data.tar.* -C "${pkgdir}/"
+}

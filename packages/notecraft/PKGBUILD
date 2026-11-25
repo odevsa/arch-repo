@@ -1,0 +1,17 @@
+pkgname=notecraft
+pkgver=0.0.20
+pkgrel=1
+pkgdesc="NoteCraft - Open-source, clean-room reimplementation of Microsoft OneNote"
+arch=('x86_64')
+url="https://github.com/AlienTechSoftware/notecraft"
+license=('Apache-2.0' 'MIT')
+provides=("${pkgname}" "notcraft")
+conflicts=("${pkgname}" "notcraft")
+options=(!strip !debug)
+
+source=("${pkgname}-${pkgver}.deb::https://github.com/AlienTechSoftware/notecraft/releases/download/v${pkgver}/${pkgname}-${pkgver}-linux-x86_64.deb")
+sha256sums=('aa3bf4899532ca87a63e0eabe73ec316639a197e8e8251ab5bef977e0c1005d5')
+
+package() {
+    bsdtar -xf data.tar.* -C "${pkgdir}/"
+}

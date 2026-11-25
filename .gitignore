@@ -13,3 +13,4 @@ packages/*/*.part
 packages/*/*.desktop
 packages/*/*.png
 packages/*/*.xml
+packages/*/*.bin

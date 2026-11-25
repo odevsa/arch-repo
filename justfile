@@ -27,7 +27,7 @@ build package="":
         cp "{{packages_dir}}/$TARGET"/sources/* "{{packages_dir}}/$TARGET"/ 2>/dev/null || true
         (cd "{{packages_dir}}/$TARGET" && makepkg -s --noconfirm -c)
         mv "{{packages_dir}}/$TARGET"/*.pkg.tar.zst "{{output_dir}}/" 2>/dev/null || true
-        for ext in install sh zip deb rpm AppImage tar.* part desktop png xml; do
+        for ext in install sh zip deb rpm AppImage tar.* part desktop png xml bin; do
             rm -f "{{packages_dir}}/$TARGET"/*.$ext
         done
     else
@@ -55,7 +55,7 @@ build package="":
             cp "$pkgdir"/sources/* "$pkgdir"/ 2>/dev/null || true
             (cd "$pkgdir" && makepkg -s --noconfirm -c)
             mv "$pkgdir"/*.pkg.tar.zst "{{output_dir}}/" 2>/dev/null || true
-            for ext in install sh zip deb rpm AppImage tar.* part desktop png xml; do
+            for ext in install sh zip deb rpm AppImage tar.* part desktop png xml bin; do
                 rm -f "$pkgdir"/*.$ext
             done
         done
@@ -143,7 +143,7 @@ clean:
     rm -rf {{packages_dir}}/*/{src,pkg}
     for pkgdir in {{packages_dir}}/*; do
         if [ -d "$pkgdir" ]; then
-            for ext in install sh zip deb rpm AppImage tar.* part desktop png xml; do
+            for ext in install sh zip deb rpm AppImage tar.* part desktop png xml bin; do
                 rm -f "$pkgdir"/*.$ext
             done
         fi

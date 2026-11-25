@@ -1,0 +1,17 @@
+pkgname=anicraft
+pkgver=0.2.1
+pkgrel=1
+pkgdesc="AniCraft - Open-source 2D animation editor written from scratch in pure Rust"
+arch=('x86_64')
+url="https://github.com/storytold/anicraft"
+license=('Apache-2.0')
+provides=("${pkgname}")
+conflicts=("${pkgname}")
+options=(!strip !debug)
+
+source=("${pkgname}-${pkgver}.deb::https://github.com/storytold/anicraft/releases/download/v${pkgver}/${pkgname}-${pkgver}-linux-x86_64.deb")
+sha256sums=('8e0321581daa591fd812b6cecccaf06a56688b2c5a6c624cbd3fee6553f403a4')
+
+package() {
+    bsdtar -xf data.tar.* -C "${pkgdir}/"
+}

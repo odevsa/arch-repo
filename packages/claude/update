@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+set -euo pipefail
+source "packages/helpers"
+
+# Get latest version
+URL="https://downloads.claude.ai/claude-code-releases/latest"
+LATEST_VERSION=$(curl -sSL "${URL}" | tr -d '[:space:]')
+
+update_version "$LATEST_VERSION"
