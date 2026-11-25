@@ -1,5 +1,5 @@
 pkgname=unsloth
-pkgver=0.1.924
+pkgver=0.1.925
 pkgrel=1
 pkgdesc="Unsloth - Local UI to run and train LLMs and diffusion models"
 arch=('x86_64')
@@ -10,7 +10,7 @@ conflicts=("${pkgname}")
 options=(!strip !debug)
 
 source=("${pkgname}-${pkgver}.deb::https://github.com/unslothai/unsloth/releases/download/v${pkgver}-beta/Unsloth-Desktop-Ubuntu.deb")
-sha256sums=('7abcc9fb5483c4f362c31372c4065df766d1fe672c8c8470cc4ce965a828e719')
+sha256sums=('9f44c41eb917609626875027d47e41c0119e4711132a5816af1d4fd2c7e4db32')
 
 package() {
     bsdtar -xf data.tar.* -C "${pkgdir}/"
