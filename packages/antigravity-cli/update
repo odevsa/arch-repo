@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+set -euo pipefail
+source "packages/helpers"
+
+# Get latest version
+MANIFEST_URL="https://antigravity-cli-auto-updater-974169037036.us-central1.run.app/manifests/linux_amd64.json"
+RESPONSE=$(curl -fsSL "${MANIFEST_URL}")
+URL=$(printf '%s' "$RESPONSE" | sed -n 's/.*"url"[[:space:]]*:[[:space:]]*"\([^\"]*\)".*/\1/p')
+
+VERSION_BUILD=$(echo "$URL" | sed -E 's|.*antigravity-cli/([^/]+)/linux-x64.*|\1|')
+LATEST_VERSION=$(echo "$VERSION_BUILD" | cut -d'-' -f1)
+LATEST_BUILD=$(echo "$VERSION_BUILD" | cut -d'-' -f2)
+
+update_version "$LATEST_VERSION" "$LATEST_BUILD"
