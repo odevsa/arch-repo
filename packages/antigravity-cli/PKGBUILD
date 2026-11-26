@@ -1,7 +1,7 @@
 pkgname=antigravity-cli
-pkgver=1.5.17
+pkgver=1.5.18
 pkgrel=1
-pkgbuild=4823843970351104
+pkgbuild=6386224290725888
 pkgdesc="Antigravity CLI - Command-line interface for Google Antigravity"
 arch=('x86_64')
 url="https://antigravity.google/"
@@ -11,7 +11,7 @@ conflicts=("${pkgname}" 'agy')
 options=(!strip !debug)
 
 source=("${pkgname}-${pkgver}.tar.gz::https://storage.googleapis.com/antigravity-public/antigravity-cli/${pkgver}-${pkgbuild}/linux-x64/cli_linux_x64.tar.gz")
-sha256sums=('6304b4f592ae97e59231cfb1b365ee29c155750c9a881f0cc8efe5f5281077cf')
+sha256sums=('a4960723ed9cf5b5ac72ed541db8df4d62741795261eb93a4681006ccb23d5ad')
 
 package() {
     install -Dm755 "${srcdir}/antigravity" "${pkgdir}/usr/bin/agy"
