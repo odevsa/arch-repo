@@ -1,5 +1,5 @@
 pkgname=notecraft
-pkgver=0.0.21
+pkgver=0.0.22
 pkgrel=1
 pkgdesc="NoteCraft - Open-source, clean-room reimplementation of Microsoft OneNote"
 arch=('x86_64')
@@ -10,7 +10,7 @@ conflicts=("${pkgname}" "notcraft")
 options=(!strip !debug)
 
 source=("${pkgname}-${pkgver}.deb::https://github.com/AlienTechSoftware/notecraft/releases/download/v${pkgver}/${pkgname}-${pkgver}-linux-x86_64.deb")
-sha256sums=('010ad6a4216303b4d6b577faf99df9ec996a032faced27eef210c51dffe53230')
+sha256sums=('894f06bc96171a4b6e1a659af176940f71727e7ba2900227d638c9b34d8fd964')
 
 package() {
     bsdtar -xf data.tar.* -C "${pkgdir}/"
